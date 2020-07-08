@@ -1,0 +1,11 @@
+.RouteScreen_Map {
+  position: relative;
+  flex: 1;
+  height: 75vh;
+  background-color: #e6e6e6;
+}
+
+.RouteScreen_Destinations {
+  padding: 1rem;
+  flex: 1;
+}

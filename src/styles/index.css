@@ -1,0 +1,27 @@
+@import-normalize; /* bring in normalize.css styles */
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.DashboardScreen {
+  padding: 2rem;
+  background-color: #f5f5f5;
+  min-height: 100%;
+}
+
+.DashboardScreen_Header {
+  margin-bottom: 1rem;
+}
+
+.CreateButton {
+  position: absolute !important;
+  bottom: 2rem;
+  right: 2rem;
+}
+
+.MuiTextField-root {
+  width: 100%;
+}

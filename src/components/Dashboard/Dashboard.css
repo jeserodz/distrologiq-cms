@@ -1,0 +1,21 @@
+.Dashboard {
+  min-width: 100vw;
+  min-height: 100vh;
+  display: flex;
+}
+
+.AppBar {
+  z-index: 100000000;
+}
+
+.Drawer {
+  width: 240px;
+}
+
+.MuiDrawer-paper {
+  width: 240px;
+}
+
+.Dasboard_Content {
+  flex: 1;
+}

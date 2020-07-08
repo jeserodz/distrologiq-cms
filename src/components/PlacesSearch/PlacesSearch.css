@@ -1,0 +1,10 @@
+.PlacesSearch {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  width: 400px;
+}
+
+.PlacesSearch_Container {
+  padding: 1rem !important;
+}

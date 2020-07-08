@@ -1,0 +1,60 @@
+.LoginScreen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 100vw;
+  min-height: 100vh;
+  background-image: url("./images/background.png");
+  background-size: cover;
+  background-position: center;
+}
+
+.LoginScreen_BgOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #d6a641;
+  opacity: 0.7;
+}
+
+.LoginContent {
+  width: 400px;
+  height: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
+  padding: 0 2rem;
+}
+
+.LoginContent_Logo {
+  width: 240px;
+  height: 40px;
+  background-image: url("./images/logo.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  margin-bottom: 8px;
+}
+
+.LoginContent_Form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.LoginContent_TextField {
+  width: 100%;
+  margin-bottom: 1em !important;
+}
+.LoginContent_TextField:last-of-type {
+  margin-bottom: 2em !important;
+}
+
+.LoginContent_Submit {
+  width: 50%;
+}
