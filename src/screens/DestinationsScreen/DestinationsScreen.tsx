@@ -1,8 +1,8 @@
-import React from "react";
-import { Paper, Table, TableHead, Typography, Fab } from "@material-ui/core";
-import { TableRow, TableCell, TableBody } from "@material-ui/core";
-import { Add } from "@material-ui/icons";
-import { Destination } from "../../graphql";
+import React from 'react';
+import { Paper, Table, TableHead, Typography, Fab } from '@material-ui/core';
+import { TableRow, TableCell, TableBody } from '@material-ui/core';
+import { Add } from '@material-ui/icons';
+import { Destination } from 'distrologiq-sdk';
 
 export interface DestinationsScreenProps {
   destinations: Destination[];
@@ -27,7 +27,7 @@ export function DestinationsScreen(props: DestinationsScreenProps) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {props.destinations.map(destination => (
+            {props.destinations.map((destination) => (
               <TableRow
                 hover
                 key={destination.id}
@@ -43,7 +43,11 @@ export function DestinationsScreen(props: DestinationsScreenProps) {
         </Table>
       </Paper>
 
-      <Fab className="CreateButton" color="primary" onClick={props.onCreatePress}>
+      <Fab
+        className="CreateButton"
+        color="primary"
+        onClick={props.onCreatePress}
+      >
         <Add />
       </Fab>
     </div>

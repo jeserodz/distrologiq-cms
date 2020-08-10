@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { useLazyQuery } from "@apollo/react-hooks";
-import { useDebouncedCallback } from "use-debounce";
-import { PlacesSearch } from "./PlacesSearch";
-import { Place } from "../../graphql";
-import { SearchPlacesData, SearchPlacesVars, SEARCH_PLACES } from "./PlacesSearch.graphql";
+import React, { useState, useContext } from 'react';
+import { useDebouncedCallback } from 'use-debounce';
+import { PlacesSearch } from './PlacesSearch';
+import { AuthContext } from '../../contexts/AuthContext';
+import { MapsApi, Place } from 'distrologiq-sdk';
+import { config } from '../../utils/config';
 
 export interface PlacesSearchConnectorProps {
   onHover: (place: Place) => void;
@@ -11,17 +11,20 @@ export interface PlacesSearchConnectorProps {
 }
 
 export function PlacesSearchConnector(props: PlacesSearchConnectorProps) {
-  const [searchPlaces, { data }] = useLazyQuery<SearchPlacesData, SearchPlacesVars>(SEARCH_PLACES);
+  const auth = useContext(AuthContext);
   const [places, setPlaces] = useState<Place[]>([]);
 
-  const [debouncedSearch] = useDebouncedCallback(
-    (query: string) => searchPlaces({ variables: { query } }),
-    1000
-  );
+  const mapsApi = new MapsApi({
+    basePath: config.API_URL,
+    accessToken: auth.accessToken!,
+  });
 
-  useEffect(() => {
-    setPlaces(data ? data.searchPlaces.places : []);
-  }, [data]);
+  async function handleSearch(searchQuery: string) {
+    const results = await mapsApi.mapsControllerSearchPlaces(searchQuery!);
+    setPlaces(results.places);
+  }
+
+  const [debouncedSearch] = useDebouncedCallback(handleSearch, 1000);
 
   function handleClick(place: Place) {
     setPlaces([]);
@@ -31,7 +34,7 @@ export function PlacesSearchConnector(props: PlacesSearchConnectorProps) {
   return (
     <PlacesSearch
       places={places}
-      onSearch={debouncedSearch}
+      onSearch={(query) => debouncedSearch(query)}
       onHover={props.onHover}
       onClick={handleClick}
     />

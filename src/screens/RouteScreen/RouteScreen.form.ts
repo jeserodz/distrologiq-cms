@@ -1,47 +1,39 @@
-import * as Yup from "yup";
-import {
-  Route,
-  RouteStop,
-  RouteStopType,
-  RouteGeometry,
-  User,
-  Destination,
-  Settings
-} from "../../graphql";
+import * as Yup from 'yup';
+import { RouteStop, RouteGeometry, User } from 'distrologiq-sdk';
 
 export interface RouteForm {
   name: string;
   stops: RouteStop[];
-  driver?: User | null;
+  driver?: User | undefined;
   distance: number;
   duration: number;
   durationWithLoadTime: number;
-  geometry: RouteGeometry | null;
-  started?: Date | null;
-  completed?: Date | null;
+  geometry: RouteGeometry | undefined;
+  started?: Date | undefined;
+  completed?: Date | undefined;
 }
 
 export const initialValues: RouteForm = {
-  name: "",
+  name: '',
   stops: [],
-  driver: null,
+  driver: undefined,
   distance: 0,
   duration: 0,
   durationWithLoadTime: 0,
-  geometry: null,
-  started: null,
-  completed: null
+  geometry: undefined,
+  started: undefined,
+  completed: undefined,
 };
 
 export const formSchema = Yup.object().shape({
-  name: Yup.string().required("Campo requerido"),
+  name: Yup.string().required('Campo requerido'),
   stops: Yup.array()
     .of(
       Yup.object().shape({
-        type: Yup.mixed<RouteStopType>().required(),
+        type: Yup.mixed<RouteStop.TypeEnum>().required(),
         destination: Yup.object().required(),
         started: Yup.date().nullable(),
-        completed: Yup.date().nullable()
+        completed: Yup.date().nullable(),
       })
     )
     .min(1)
@@ -50,9 +42,7 @@ export const formSchema = Yup.object().shape({
   distance: Yup.number().required(),
   duration: Yup.number().required(),
   durationWithLoadTime: Yup.number().required(),
-  geometry: Yup.object()
-    .nullable()
-    .required(),
+  geometry: Yup.object().nullable().required(),
   started: Yup.date().nullable(),
-  completed: Yup.date().nullable()
+  completed: Yup.date().nullable(),
 });

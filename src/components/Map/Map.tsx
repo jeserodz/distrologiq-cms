@@ -1,9 +1,9 @@
-import React from "react";
-import ReactMapGL, { Marker, FlyToInterpolator } from "react-map-gl";
-import { MyLocation, Business } from "@material-ui/icons";
-import { RouteStop, RouteGeometry } from "../../graphql";
-import { Place } from "../../types";
-import { drawDirections } from "../../utils/map";
+import React from 'react';
+import ReactMapGL, { Marker, FlyToInterpolator } from 'react-map-gl';
+import { MyLocation, Business } from '@material-ui/icons';
+import { RouteStop, RouteGeometry } from 'distrologiq-sdk';
+import { Place } from '../../types';
+import { drawDirections } from '../../utils/map';
 
 export interface MapProps {
   companyPlace?: { latitude: number; longitude: number };
@@ -18,11 +18,11 @@ export function Map(props: MapProps) {
   const mapRef = React.useRef<any>();
 
   const [viewport, setViewport] = React.useState<any>({
-    width: "100%",
-    height: "100%",
+    width: '100%',
+    height: '100%',
     latitude: 18.4861838,
     longitude: -69.9299827,
-    zoom: 12
+    zoom: 12,
   });
 
   // Focus place when passed via props
@@ -31,8 +31,9 @@ export function Map(props: MapProps) {
     setViewport({
       ...viewport,
       latitude: props.focusedPlace.latitude,
-      longitude: props.focusedPlace.longitude
+      longitude: props.focusedPlace.longitude,
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.focusedPlace]);
 
   // Draw line string of the route
@@ -46,7 +47,7 @@ export function Map(props: MapProps) {
   return (
     <ReactMapGL
       {...viewport}
-      style={{ width: "100%", height: "100%" }}
+      style={{ width: '100%', height: '100%' }}
       mapStyle="mapbox://styles/jeserodz/cjxln02dv0zgc1cntvo5k6kf3"
       mapboxApiAccessToken="pk.eyJ1IjoiamVzZXJvZHoiLCJhIjoiY2p4aTRlNms3MWU2bzNvcDZmeGJiaTJjdyJ9.ajEmSNssUbSb-00R15Sf1w"
       transitionInterpolator={new FlyToInterpolator()}
@@ -78,7 +79,7 @@ export function Map(props: MapProps) {
       )}
 
       {props.routeStops &&
-        props.routeStops.map(stop => (
+        props.routeStops.map((stop) => (
           <Marker
             key={stop.destination.id}
             latitude={stop.destination.latitude}

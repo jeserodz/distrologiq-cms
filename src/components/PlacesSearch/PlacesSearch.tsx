@@ -1,8 +1,8 @@
-import React from "react";
-import { Paper, TextField } from "@material-ui/core";
-import { List, ListItem, ListItemText } from "@material-ui/core";
-import { Place } from "../../types";
-import "./PlacesSearch.css";
+import React from 'react';
+import { Paper, TextField } from '@material-ui/core';
+import { List, ListItem, ListItemText } from '@material-ui/core';
+import { Place } from 'distrologiq-sdk';
+import './PlacesSearch.css';
 
 export interface PlacesSearchProps {
   places: Place[];
@@ -12,16 +12,16 @@ export interface PlacesSearchProps {
 }
 
 export function PlacesSearch(props: PlacesSearchProps) {
-  const [searchText, setSearchText] = React.useState("");
+  const [searchText, setSearchText] = React.useState('');
 
   function handleChange(value: string) {
     setSearchText(value);
-    props.onSearch(searchText);
+    props.onSearch(value);
   }
 
   function handleClick(place: Place) {
     props.onClick(place);
-    setSearchText("");
+    setSearchText('');
   }
 
   return (
@@ -30,10 +30,10 @@ export function PlacesSearch(props: PlacesSearchProps) {
         <TextField
           label="Buscar Destino"
           value={searchText}
-          onChange={e => handleChange(e.target.value)}
+          onChange={(e) => handleChange(e.target.value)}
         />
         <List>
-          {props.places.map(p => (
+          {props.places.map((p) => (
             <ListItem
               button
               onMouseOver={() => props.onHover(p)}

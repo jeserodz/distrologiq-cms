@@ -1,19 +1,24 @@
-import React from "react";
-import { useHistory } from "react-router-dom";
-import { useQuery } from "@apollo/react-hooks";
-import { GET_CURRENT_USER, GetCurrentUserData } from "./AuthGuard.graphql";
+import { useContext } from 'react';
+import { useHistory } from 'react-router-dom';
+import { useQuery } from 'react-query';
+import { config } from '../../utils/config';
+import { AuthContext } from '../../contexts/AuthContext';
+import { api } from '../../utils/api';
 
 export interface AuthGuardProps {
   children: any;
 }
 
 export function AuthGuard(props: AuthGuardProps) {
-  const { data, error } = useQuery<GetCurrentUserData>(GET_CURRENT_USER);
   const history = useHistory();
 
-  React.useEffect(() => {
-    if (error) history.replace("/login");
-  }, [data, error, history]);
+  const { error } = useQuery('verifyAccessToken', () =>
+    api.get('/auth/verifyAccessToken')
+  );
+
+  if (error) {
+    history.replace('/login');
+  }
 
   return props.children;
 }

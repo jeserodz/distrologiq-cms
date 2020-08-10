@@ -1,25 +1,29 @@
-import React from "react";
-import { useHistory } from "react-router-dom";
-import { useMutation } from "@apollo/react-hooks";
-import { LoginScreen } from "./LoginScreen";
-import { LoginForm } from "./LoginScreen.form";
-import { LOGIN, LoginData, LoginVariables } from "./LoginScreen.grahpql";
+import React, { useContext } from 'react';
+import { useHistory } from 'react-router-dom';
+import { LoginScreen } from './LoginScreen';
+import { AuthApi, SignInDto } from 'distrologiq-sdk';
+import { useMutation } from 'react-query';
+import { AuthContext } from '../../contexts/AuthContext';
+import { config } from '../../utils/config';
 
 export function LoginScreenConnector() {
   const history = useHistory();
-  const [login, { data }] = useMutation<LoginData, LoginVariables>(LOGIN);
+  const auth = useContext(AuthContext);
 
-  function handleSubmit(values: LoginForm) {
-    const { username, password } = values;
-    login({ variables: { username, password } });
+  const authApi = new AuthApi({
+    basePath: config.API_URL,
+    accessToken: auth.accessToken!,
+  });
+
+  const [signIn, { data }] = useMutation(async (data: SignInDto) =>
+    authApi.authControllerSignIn(data)
+  );
+
+  if (data) {
+    auth.setAccessToken(data.accessToken);
+    history.replace('/dashboard');
   }
 
-  React.useEffect(() => {
-    if (data) {
-      localStorage.setItem("token", data.login.jwt);
-      history.replace("/dashboard");
-    }
-  }, [data]);
-
-  return <LoginScreen onSubmit={handleSubmit} />;
+  // return <LoginScreen onSubmit={(values) => signIn(values)} />;
+  return <LoginScreen onSubmit={(values) => signIn(values)} />;
 }

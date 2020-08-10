@@ -1,35 +1,45 @@
-import React from "react";
-import { useQuery, useMutation } from "@apollo/react-hooks";
-import { SettingsScreen } from "./SettingsScreen";
-import { SettingsForm } from "./SettingsForm";
-import { Toaster } from "../../utils/toaster";
-import {
-  GET_SETTINGS,
-  GetSettingsData,
-  SET_SETTINGS,
-  SetSettingsVars
-} from "./SettingsScreen.graphql";
+import React, { useContext } from 'react';
+import { SettingsScreen } from './SettingsScreen';
+import { SettingsForm } from './SettingsForm';
+import { Toaster } from '../../utils/toaster';
+import { useQuery, useMutation } from 'react-query';
+import { SettingsApi, SetSettingsDTO } from 'distrologiq-sdk';
+import { config } from '../../utils/config';
+import { AuthContext } from '../../contexts/AuthContext';
 
 export function SettingsScreenConnector() {
-  const { data, refetch } = useQuery<GetSettingsData>(GET_SETTINGS);
-  const [setSettings] = useMutation<GetSettingsData, SetSettingsVars>(SET_SETTINGS, {
-    onCompleted: () => {
-      Toaster.show("success", "Cambios guardados.");
-      refetch();
-    }
+  const auth = useContext(AuthContext);
+
+  const settingsApi = new SettingsApi({
+    basePath: config.API_URL,
+    accessToken: auth.accessToken!,
   });
 
+  const { data, refetch } = useQuery('fetchSettings', () =>
+    settingsApi.settingsControllerIndex()
+  );
+
+  const [setSettings] = useMutation(
+    (data: SetSettingsDTO) => settingsApi.settingsControllerSetSettings(data),
+    {
+      onSuccess: () => {
+        Toaster.show('success', 'Cambios guardados.');
+        refetch();
+      },
+    }
+  );
+
   function handleSubmit(data: SettingsForm) {
-    setSettings({ variables: data });
+    setSettings(data);
   }
 
   return data ? (
     <SettingsScreen
       settings={{
-        name: data.settings.name,
-        avgLoadTime: data.settings.avgLoadTime,
-        latitude: data.settings.destination.latitude,
-        longitude: data.settings.destination.longitude
+        name: data.name,
+        avgLoadTime: data.avgLoadTime,
+        latitude: data.destination.latitude,
+        longitude: data.destination.longitude,
       }}
       onSubmit={handleSubmit}
     />

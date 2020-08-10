@@ -1,59 +1,60 @@
-import React from "react";
-import { useParams, useHistory } from "react-router-dom";
-import { DestinationScreen } from "./DestinationScreen";
-import { DestinationForm } from "./DestinationScreen.form";
-import { useLazyQuery, useMutation } from "@apollo/react-hooks";
+import React, { useContext } from 'react';
+import { useParams, useHistory } from 'react-router-dom';
+import { DestinationScreen } from './DestinationScreen';
+import { DestinationForm } from './DestinationScreen.form';
+import { useQuery, useMutation } from 'react-query';
+import { Toaster } from '../../utils/toaster';
 import {
-  GetDestinationData,
-  GetDestinationVars,
-  GET_DESTINATION,
-  CreateDestinationData,
-  CreateDestinationVars,
-  CREATE_DESTINATION,
-  UpdateDestinationData,
-  UpdateDestinationVars,
-  UPDATE_DESTINATION
-} from "./DestinationScreen.graphql";
-import { Toaster } from "../../utils/toaster";
+  DestinationsApi,
+  CreateDestinationDTO,
+  UpdateDestinationDTO,
+} from 'distrologiq-sdk';
+import { config } from '../../utils/config';
+import { AuthContext } from '../../contexts/AuthContext';
 
 export function DestinationScreenConnector() {
   const { id } = useParams();
   const history = useHistory();
+  const auth = useContext(AuthContext);
 
-  const [getDestination, { data, loading }] = useLazyQuery<GetDestinationData, GetDestinationVars>(
-    GET_DESTINATION
+  const destinationsApi = new DestinationsApi({
+    basePath: config.API_URL,
+    accessToken: auth.accessToken!,
+  });
+
+  const { data: destination, isLoading } = useQuery('fetchDestination', () =>
+    destinationsApi.destinationsControllerShow(id)
   );
 
-  const [createDestination, { data: createData }] = useMutation<
-    CreateDestinationData,
-    CreateDestinationVars
-  >(CREATE_DESTINATION);
-
-  const [updateDestination, {}] = useMutation<UpdateDestinationData, UpdateDestinationVars>(
-    UPDATE_DESTINATION
+  const [createDestination] = useMutation((data: CreateDestinationDTO) =>
+    destinationsApi.destinationsControllerCreate(data)
   );
 
-  React.useEffect(() => {
-    if (id) getDestination({ variables: { id } });
-  }, [id]);
+  const [updateDestination] = useMutation((data: UpdateDestinationDTO) =>
+    destinationsApi.destinationsControllerUpdate(data, id)
+  );
 
   async function handleCreate(values: DestinationForm) {
-    const { data } = await createDestination({ variables: values });
-    Toaster.show("success", "Destino creado.");
-    if (data) history.replace(`/dashboard/destinations/${data.createDestination.id}`);
+    const destination = await createDestination(values);
+    Toaster.show('success', 'Destino creado.');
+    history.replace(`/dashboard/destinations/${destination.id}`);
   }
 
-  async function handleUpdate(values: DestinationForm) {
+  async function handleUpdate(data: UpdateDestinationDTO) {
     if (!id) return;
-    const { data } = await updateDestination({ variables: { id, ...values } });
-    Toaster.show("success", "Destino actualizado.");
-    if (data) history.replace(`/dashboard/destinations/${data.updateDestination.id}`);
+    const destination = await updateDestination(data);
+    Toaster.show('success', 'Destino actualizado.');
+    history.replace(`/dashboard/destinations/${destination.id}`);
   }
 
-  return loading ? null : (
+  return isLoading ? null : (
     <DestinationScreen
-      destination={data ? data.destination : null}
-      onSubmit={id ? handleUpdate : handleCreate}
+      destination={destination}
+      onSubmit={(data) =>
+        id
+          ? handleUpdate(data as UpdateDestinationDTO)
+          : handleCreate(data as CreateDestinationDTO)
+      }
     />
   );
 }

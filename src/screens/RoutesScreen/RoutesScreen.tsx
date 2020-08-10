@@ -1,13 +1,13 @@
-import React from "react";
-import { Paper, Table, TableHead, Typography, Fab } from "@material-ui/core";
-import { TableRow, TableCell, TableBody } from "@material-ui/core";
-import { Add } from "@material-ui/icons";
-import { Route } from "../../graphql";
+import React from 'react';
+import { Paper, Table, TableHead, Typography, Fab } from '@material-ui/core';
+import { TableRow, TableCell, TableBody } from '@material-ui/core';
+import { Add } from '@material-ui/icons';
+import { Route } from 'distrologiq-sdk';
 import {
   displayDistance,
   displayDuration,
-  displayRoutePerformance
-} from "../../utils/display-helpers";
+  displayRoutePerformance,
+} from '../../utils/display-helpers';
 
 export interface RoutesScreenProps {
   routes: Route[];
@@ -37,18 +37,29 @@ export function RoutesScreen(props: RoutesScreenProps) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {props.routes.map(route => (
-              <TableRow hover key={route.id} onClick={() => props.onRoutePress(route)}>
+            {props.routes.map((route) => (
+              <TableRow
+                hover
+                key={route.id}
+                onClick={() => props.onRoutePress(route)}
+              >
                 <TableCell>{route.name}</TableCell>
                 <TableCell>{route.stops.length}</TableCell>
                 <TableCell>{displayDistance(route.distance)}</TableCell>
-                <TableCell>{route.started ? "Si" : "No"}</TableCell>
-                <TableCell>{route.completed ? "Si" : "No"}</TableCell>
-                <TableCell>{route.driver ? route.driver.displayName : "Sin Asignar"}</TableCell>
-                <TableCell>{displayDuration(route.duration)}</TableCell>
-                <TableCell>{displayDuration(route.completedDuration)}</TableCell>
+                <TableCell>{route.started ? 'Si' : 'No'}</TableCell>
+                <TableCell>{route.completed ? 'Si' : 'No'}</TableCell>
                 <TableCell>
-                  {displayRoutePerformance(route.duration, route.completedDuration)}
+                  {route.driver ? route.driver.displayName : 'Sin Asignar'}
+                </TableCell>
+                <TableCell>{displayDuration(route.duration)}</TableCell>
+                <TableCell>
+                  {displayDuration(route.completedDuration)}
+                </TableCell>
+                <TableCell>
+                  {displayRoutePerformance(
+                    route.duration,
+                    route.completedDuration
+                  )}
                 </TableCell>
               </TableRow>
             ))}
@@ -56,7 +67,11 @@ export function RoutesScreen(props: RoutesScreenProps) {
         </Table>
       </Paper>
 
-      <Fab className="CreateButton" color="primary" onClick={props.onCreatePress}>
+      <Fab
+        className="CreateButton"
+        color="primary"
+        onClick={props.onCreatePress}
+      >
         <Add />
       </Fab>
     </div>

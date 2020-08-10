@@ -1,25 +1,35 @@
-import React from "react";
-import { useHistory } from "react-router";
-import { RoutesScreen } from "./RoutesScreen";
-import { Route } from "../../graphql";
-import { useQuery } from "@apollo/react-hooks";
-import { GET_ROUTES, GetRoutesData } from "./RoutesScreen.graphql";
+import React, { useContext } from 'react';
+import { useHistory } from 'react-router';
+import { RoutesScreen } from './RoutesScreen';
+import { useQuery } from 'react-query';
+import { AuthContext } from '../../contexts/AuthContext';
+import { RoutesApi, Route } from 'distrologiq-sdk';
+import { config } from '../../utils/config';
 
 export function RoutesScreenConnector() {
   const history = useHistory();
-  const { data } = useQuery<GetRoutesData>(GET_ROUTES);
+  const auth = useContext(AuthContext);
+
+  const routesApi = new RoutesApi({
+    basePath: config.API_URL,
+    accessToken: auth.accessToken!,
+  });
+
+  const { data } = useQuery('fetchRoutes', () =>
+    routesApi.routesControllerIndex()
+  );
 
   function handleRoutePress(route: Route) {
     history.push(`/dashboard/routes/${route.id}`);
   }
 
   function handleCreatePress() {
-    history.push("/dashboard/routes/new");
+    history.push('/dashboard/routes/new');
   }
 
   return data ? (
     <RoutesScreen
-      routes={data.routes || []}
+      routes={data || []}
       onRoutePress={handleRoutePress}
       onCreatePress={handleCreatePress}
     />
