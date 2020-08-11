@@ -15,7 +15,7 @@
     "axios": "^0.19.2",
     "class-transformer": "^0.2.3",
     "date-fns": "^2.15.0",
-    "distrologiq-sdk": "https://github.com/jeserodz/distrologiq-sdk/releases/download/1.1.0/distrologiq-sdk-1.1.0.tgz",
+    "distrologiq-sdk": "https://github.com/jeserodz/distrologiq-sdk/releases/download/0.1.0/distrologiq-sdk-0.1.0.tgz",
     "easy-peasy": "^3.3.1",
     "firebase": "^7.17.1",
     "formik": "^2.1.5",
