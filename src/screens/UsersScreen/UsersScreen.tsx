@@ -1,22 +1,17 @@
 import React from "react";
 import { Paper, Table, TableHead, Typography } from "@material-ui/core";
 import { TableRow, TableCell, TableBody } from "@material-ui/core";
-import { useHistory, useLocation } from "react-router-dom";
-import { useQuery } from "@apollo/react-hooks";
-import { GET_USERS, GetUsersData } from "./UsersScreen.graphql";
-import { User } from "../../graphql";
 import { renderRoles } from "../../utils/render-roles";
+import { User } from "distrologiq-sdk";
 
-export function UsersScreen() {
-  const history = useHistory();
-  const location = useLocation();
-  const { data } = useQuery<GetUsersData>(GET_USERS);
+export interface UsersScreenProps {
+  users: User[];
+  onUserPress: (user: User) => void;
+  onCreatePress: () => void;
+}
 
-  function handleUserPress(user: User) {
-    history.push(`${location.pathname}/${user.id}`);
-  }
-
-  return data ? (
+export function UsersScreen(props: UsersScreenProps) {
+  return (
     <div className="DashboardScreen UsersScreen">
       <div className="DashboardScreen_Header">
         <Typography variant="h5">Usuarios</Typography>
@@ -31,8 +26,12 @@ export function UsersScreen() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {data.users.map(user => (
-              <TableRow hover key={user.id} onClick={() => handleUserPress(user)}>
+            {props.users.map((user) => (
+              <TableRow
+                hover
+                key={user.id}
+                onClick={() => props.onUserPress(user)}
+              >
                 <TableCell>{user.displayName}</TableCell>
                 <TableCell>{user.email}</TableCell>
                 <TableCell>{renderRoles(user)}</TableCell>
@@ -42,5 +41,5 @@ export function UsersScreen() {
         </Table>
       </Paper>
     </div>
-  ) : null;
+  );
 }

@@ -1,11 +1,11 @@
-import React, { useContext } from 'react';
-import { useHistory, useParams } from 'react-router';
-import { useQuery, useMutation } from 'react-query';
-import { Toaster } from '../../utils/toaster';
-import { RouteScreen } from './RouteScreen';
-import { RouteForm } from './RouteScreen.form';
-import { config } from '../../utils/config';
-import { AuthContext } from '../../contexts/AuthContext';
+import React, { useContext } from "react";
+import { useHistory, useParams } from "react-router";
+import { useQuery, useMutation } from "react-query";
+import { Toaster } from "../../utils/toaster";
+import { RouteScreen } from "./RouteScreen";
+// import { RouteForm } from './RouteScreen.form';
+import { config } from "../../utils/config";
+import { AuthContext } from "../../contexts/AuthContext";
 import {
   RoutesApi,
   MapsApi,
@@ -16,7 +16,7 @@ import {
   DestinationsApi,
   UsersApi,
   SettingsApi,
-} from 'distrologiq-sdk';
+} from "distrologiq-sdk";
 
 export function RouteScreenConnector() {
   const history = useHistory();
@@ -48,19 +48,19 @@ export function RouteScreenConnector() {
     accessToken: auth.accessToken!,
   });
 
-  const { data: route } = useQuery(['fetchRoute', id], (key, id) =>
+  const { data: route } = useQuery(["fetchRoute", id], (key, id) =>
     routesApi.routesControllerShow(id)
   );
 
-  const { data: destinations } = useQuery('fetchDestinations', () =>
+  const { data: destinations } = useQuery("fetchDestinations", () =>
     destinationsApi.destinationsControllerIndex()
   );
 
-  const { data: users } = useQuery('fetchDrivers', () =>
+  const { data: users } = useQuery("fetchDrivers", () =>
     usersApi.usersControllerIndex()
   );
 
-  const { data: settings } = useQuery('fetchSettings', () =>
+  const { data: settings } = useQuery("fetchSettings", () =>
     settingsApi.settingsControllerIndex()
   );
 
@@ -81,13 +81,13 @@ export function RouteScreenConnector() {
 
   async function handleUpdate(data: UpdateRouteDTO) {
     const route = await updateRoute(data);
-    Toaster.show('success', 'Ruta actualizada.');
+    Toaster.show("success", "Ruta actualizada.");
     history.replace(`/dashboard/routes/${route.id}`);
   }
 
   async function handleCreate(data: CreateRouteDTO) {
     const route = await createRoute(data);
-    Toaster.show('success', 'Ruta creada.');
+    Toaster.show("success", "Ruta creada.");
     history.replace(`/dashboard/routes/${route.id}`);
   }
 
