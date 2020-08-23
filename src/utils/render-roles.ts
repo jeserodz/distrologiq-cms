@@ -1,4 +1,4 @@
-import { User } from "../graphql";
+import { User } from "distrologiq-sdk";
 
 export function renderRoles(user: User) {
   const roles = [];

@@ -4,7 +4,7 @@ import { Switch, Route, useHistory, Redirect } from "react-router-dom";
 import { makeStyles, createStyles, Theme } from "@material-ui/core";
 import { DashboardLinks } from "./DaskboardLinks";
 import { DashboardSidebar } from "./DashboardSidebar";
-import { UsersScreen } from "../../screens/UsersScreen";
+import { UsersScreenConnector } from "../../screens/UsersScreen";
 import { UserScreenConnector } from "../../screens/UserScreen";
 import { DestinationsScreenConnector } from "../../screens/DestinationsScreen";
 import { DestinationScreenConnector } from "../../screens/DestinationScreen";
@@ -16,16 +16,16 @@ import "./Dashboard.css";
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      display: "flex"
+      display: "flex",
     },
     appBar: {
-      zIndex: theme.zIndex.drawer + 1
+      zIndex: theme.zIndex.drawer + 1,
     },
     content: {
       flexGrow: 1,
-      padding: theme.spacing(3)
+      padding: theme.spacing(3),
     },
-    toolbar: theme.mixins.toolbar
+    toolbar: theme.mixins.toolbar,
   })
 );
 
@@ -60,7 +60,7 @@ export function Dashboard() {
         <Switch>
           <Redirect exact from="/dashboard" to="/dashboard/settings" />
           <Route exact path="/dashboard/users">
-            <UsersScreen />
+            <UsersScreenConnector />
           </Route>
           <Route exact path="/dashboard/users/:id">
             <UserScreenConnector />
