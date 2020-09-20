@@ -2,13 +2,28 @@ const fs = require('fs');
 const path = require('path');
 const dotenv = require('dotenv');
 
-const config = dotenv.config();
+const envFilePath = path.resolve(__dirname, '../.env');
+const outputFilePath = path.resolve(__dirname, '../public/env.js');
 
-const template = `
-// Auto-generated Development Configuration
-window.env = ${JSON.stringify(config.parsed, null, 2)};
-`;
+function generate() {
+  const config = dotenv.config({ path: envFilePath });
 
-fs.writeFileSync(path.resolve(__dirname, '../public/env.js'), template);
+  const template =
+    `// Auto-generated Development Configuration\n` +
+    `window.env = ${JSON.stringify(config.parsed, null, 2)};\n`;
 
-console.log('Updated public/env.js');
+  fs.writeFileSync(outputFilePath, template);
+
+  console.log('Updated public/env.js');
+}
+
+generate();
+
+if (process.argv.includes('--watch')) {
+  console.log('Watching for changes in the .env file...');
+
+  fs.watchFile(envFilePath, () => {
+    console.log('Detected changed in the .env file');
+    generate();
+  });
+}
