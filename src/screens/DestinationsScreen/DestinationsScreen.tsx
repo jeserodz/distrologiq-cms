@@ -2,7 +2,7 @@ import React from 'react';
 import { Paper, Table, TableHead, Typography, Fab } from '@material-ui/core';
 import { TableRow, TableCell, TableBody } from '@material-ui/core';
 import { Add } from '@material-ui/icons';
-import { Destination } from 'distrologiq-sdk';
+import { Destination } from '../../api';
 
 export interface DestinationsScreenProps {
   destinations: Destination[];

@@ -4,34 +4,30 @@ import { DestinationScreen } from './DestinationScreen';
 import { DestinationForm } from './DestinationScreen.form';
 import { useQuery, useMutation } from 'react-query';
 import { Toaster } from '../../utils/toaster';
+import { Context } from '../../Context';
 import {
   DestinationsApi,
   CreateDestinationDTO,
   UpdateDestinationDTO,
-} from 'distrologiq-sdk';
-import { config } from '../../utils/config';
-import { AuthContext } from '../../contexts/AuthContext';
+} from '../../api';
 
 export function DestinationScreenConnector() {
   const { id } = useParams();
   const history = useHistory();
-  const auth = useContext(AuthContext);
+  const context = useContext(Context);
 
-  const destinationsApi = new DestinationsApi({
-    basePath: config.API_URL,
-    accessToken: auth.accessToken!,
-  });
+  const destinationsApi = new DestinationsApi(context.getApiConfig());
 
-  const { data: destination, isLoading } = useQuery('fetchDestination', () =>
-    destinationsApi.destinationsControllerShow(id)
+  const getDestinationResponse = useQuery('getDestination', () =>
+    destinationsApi.getDestination(id)
   );
 
   const [createDestination] = useMutation((data: CreateDestinationDTO) =>
-    destinationsApi.destinationsControllerCreate(data)
+    destinationsApi.createDestination(data)
   );
 
   const [updateDestination] = useMutation((data: UpdateDestinationDTO) =>
-    destinationsApi.destinationsControllerUpdate(data, id)
+    destinationsApi.updateDestination(id, data)
   );
 
   async function handleCreate(values: DestinationForm) {
@@ -47,9 +43,9 @@ export function DestinationScreenConnector() {
     history.replace(`/dashboard/destinations/${destination.id}`);
   }
 
-  return isLoading ? null : (
+  return getDestinationResponse.isLoading ? null : (
     <DestinationScreen
-      destination={destination}
+      destination={getDestinationResponse.data}
       onSubmit={(data) =>
         id
           ? handleUpdate(data as UpdateDestinationDTO)

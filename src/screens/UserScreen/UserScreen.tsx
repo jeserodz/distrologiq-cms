@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   Typography,
   Paper,
@@ -14,16 +14,17 @@ import {
   FormLabel,
   TableHead,
   Dialog,
-} from "@material-ui/core";
-import { Formik } from "formik";
-import { User } from "distrologiq-sdk";
-import { formSchema, initialValues } from "./UserScreen.form";
-import { SimpleDialog } from "../../components/SimpleDialog";
-import colors from "../../utils/colors";
+} from '@material-ui/core';
+import { Formik } from 'formik';
+import { User } from 'distrologiq-sdk';
+import { formSchema, initialValues } from './UserScreen.form';
+import { SimpleDialog } from '../../components/SimpleDialog';
+import colors from '../../utils/colors';
 
 export interface UserScreenProps {
   user: User | undefined;
   onSubmit: (values: any) => void;
+  onAnalyticsClick: (user: User) => void;
 }
 
 export function UserScreen(props: UserScreenProps) {
@@ -64,7 +65,7 @@ export function UserScreen(props: UserScreenProps) {
                         <TableCell
                           style={{
                             backgroundColor: colors.primaryDark,
-                            color: "white",
+                            color: 'white',
                           }}
                           colSpan={2}
                         >
@@ -128,7 +129,7 @@ export function UserScreen(props: UserScreenProps) {
                         <TableCell
                           style={{
                             backgroundColor: colors.primaryDark,
-                            color: "white",
+                            color: 'white',
                           }}
                           colSpan={2}
                         >
@@ -170,6 +171,14 @@ export function UserScreen(props: UserScreenProps) {
                 </TableRow>
                 <TableRow>
                   <TableCell>
+                    <Button
+                      variant="contained"
+                      color="secondary"
+                      style={{ marginRight: 20 }}
+                      onClick={() => props.onAnalyticsClick(props.user!)}
+                    >
+                      Ver Métricas
+                    </Button>
                     <Button
                       variant="contained"
                       color="secondary"

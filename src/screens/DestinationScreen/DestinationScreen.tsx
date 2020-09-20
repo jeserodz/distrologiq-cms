@@ -1,17 +1,17 @@
-import React from "react";
-import { Typography, Paper, Table, TableRow, Button } from "@material-ui/core";
-import { TableCell, TableBody, TextField } from "@material-ui/core";
-import { Formik } from "formik";
-import { Map } from "../../components/Map";
-import { PlacesSearchConnector } from "../../components/PlacesSearch";
-import { Place } from "../../types";
-import { Destination } from "distrologiq-sdk";
+import React from 'react';
+import { Typography, Paper, Table, TableRow, Button } from '@material-ui/core';
+import { TableCell, TableBody, TextField } from '@material-ui/core';
+import { Formik } from 'formik';
+import { Map } from '../../components/Map';
+import { PlacesSearchConnector } from '../../components/PlacesSearch';
+import { Place } from '../../types';
+import { Destination } from '../../api';
 import {
   DestinationForm,
   formSchema,
   initialValues,
-} from "./DestinationScreen.form";
-import "./DestinationScreen.css";
+} from './DestinationScreen.form';
+import './DestinationScreen.css';
 
 export interface DestinationScreenProps {
   destination: Destination | undefined;
@@ -27,13 +27,13 @@ export function DestinationScreen(props: DestinationScreenProps) {
 
   function handleSearchPlaceClick(place: Place, setFieldValue: any) {
     setFocusedPlace(null);
-    setFieldValue("latitude", place.latitude);
-    setFieldValue("longitude", place.longitude);
+    setFieldValue('latitude', place.latitude);
+    setFieldValue('longitude', place.longitude);
   }
 
   function handleMapDblClick(lat: number, lng: number, setFieldValue: any) {
-    setFieldValue("latitude", lat);
-    setFieldValue("longitude", lng);
+    setFieldValue('latitude', lat);
+    setFieldValue('longitude', lng);
   }
 
   function handleSubmit(values: DestinationForm) {

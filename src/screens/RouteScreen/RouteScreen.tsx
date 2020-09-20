@@ -18,7 +18,8 @@ import {
   CalculateRouteResponse,
   RouteGeometry,
   Settings,
-} from 'distrologiq-sdk';
+  RouteStopTypeEnum,
+} from '../../api';
 
 export interface RouteScreenProps {
   route: Route | undefined;
@@ -49,7 +50,7 @@ export function RouteScreen(props: RouteScreenProps) {
       const oldStop = oldStops.find((s) => s.destination.id === destination.id);
       return {
         destination,
-        type: oldStop ? oldStop.type : RouteStop.TypeEnum.DELIVERY,
+        type: oldStop ? oldStop.type : RouteStopTypeEnum.DELIVERY,
         started: oldStop ? oldStop.started : null,
         completed: oldStop ? oldStop.completed : null,
       };
@@ -60,7 +61,7 @@ export function RouteScreen(props: RouteScreenProps) {
 
   function handleRouteStopTypeChange(
     routeStop: RouteStop,
-    type: RouteStop.TypeEnum
+    type: RouteStopTypeEnum
   ) {
     const stops = [...formik.values.stops];
 
@@ -104,7 +105,7 @@ export function RouteScreen(props: RouteScreenProps) {
   function initializeFinalStop() {
     if (formik.values.stops.length === 0 && props.settings) {
       const finalStop = {
-        type: RouteStop.TypeEnum.ARRIVAL,
+        type: RouteStopTypeEnum.ARRIVAL,
         destination: props.settings.destination,
         started: null,
         completed: null,

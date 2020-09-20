@@ -1,22 +1,23 @@
-import React from "react";
-import { AppBar, Toolbar, Typography } from "@material-ui/core";
-import { Switch, Route, useHistory, Redirect } from "react-router-dom";
-import { makeStyles, createStyles, Theme } from "@material-ui/core";
-import { DashboardLinks } from "./DaskboardLinks";
-import { DashboardSidebar } from "./DashboardSidebar";
-import { UsersScreenConnector } from "../../screens/UsersScreen";
-import { UserScreenConnector } from "../../screens/UserScreen";
-import { DestinationsScreenConnector } from "../../screens/DestinationsScreen";
-import { DestinationScreenConnector } from "../../screens/DestinationScreen";
-import { RouteScreenConnector } from "../../screens/RouteScreen";
-import { RoutesScreenConnector } from "../../screens/RoutesScreen";
-import { SettingsScreenConnector } from "../../screens/SettingsScreen";
-import "./Dashboard.css";
+import React from 'react';
+import { AppBar, Toolbar, Typography } from '@material-ui/core';
+import { Switch, Route, useHistory, Redirect } from 'react-router-dom';
+import { makeStyles, createStyles, Theme } from '@material-ui/core';
+import { DashboardLinks } from './DaskboardLinks';
+import { DashboardSidebar } from './DashboardSidebar';
+import { UsersScreenConnector } from '../../screens/UsersScreen';
+import { UserScreenConnector } from '../../screens/UserScreen';
+import { UserAnalyticsScreen } from '../../screens/UserAnalyticsScreen/UserAnalyticsScreen';
+import { DestinationsScreenConnector } from '../../screens/DestinationsScreen';
+import { DestinationScreenConnector } from '../../screens/DestinationScreen';
+import { RouteScreenConnector } from '../../screens/RouteScreen';
+import { RoutesScreenConnector } from '../../screens/RoutesScreen';
+import { SettingsScreenConnector } from '../../screens/SettingsScreen';
+import './Dashboard.css';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      display: "flex",
+      display: 'flex',
     },
     appBar: {
       zIndex: theme.zIndex.drawer + 1,
@@ -64,6 +65,9 @@ export function Dashboard() {
           </Route>
           <Route exact path="/dashboard/users/:id">
             <UserScreenConnector />
+          </Route>
+          <Route exact path="/dashboard/users/:id/analytics">
+            <UserAnalyticsScreen />
           </Route>
           <Route exact path="/dashboard/destinations">
             <DestinationsScreenConnector />

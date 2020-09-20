@@ -1,9 +1,8 @@
 import React, { useState, useContext } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 import { PlacesSearch } from './PlacesSearch';
-import { AuthContext } from '../../contexts/AuthContext';
-import { MapsApi, Place } from 'distrologiq-sdk';
-import { config } from '../../utils/config';
+import { Place, MapsApi } from '../../api';
+import { Context } from '../../Context';
 
 export interface PlacesSearchConnectorProps {
   onHover: (place: Place) => void;
@@ -11,17 +10,14 @@ export interface PlacesSearchConnectorProps {
 }
 
 export function PlacesSearchConnector(props: PlacesSearchConnectorProps) {
-  const auth = useContext(AuthContext);
+  const context = useContext(Context);
   const [places, setPlaces] = useState<Place[]>([]);
 
-  const mapsApi = new MapsApi({
-    basePath: config.API_URL,
-    accessToken: auth.accessToken!,
-  });
+  const mapsApi = new MapsApi(context.getApiConfig());
 
   async function handleSearch(searchQuery: string) {
-    const results = await mapsApi.mapsControllerSearchPlaces(searchQuery!);
-    setPlaces(results.places);
+    const data = await mapsApi.searchPlaces(searchQuery!);
+    setPlaces(data.places);
   }
 
   const [debouncedSearch] = useDebouncedCallback(handleSearch, 1000);

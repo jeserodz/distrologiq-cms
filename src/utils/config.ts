@@ -1,3 +1,3 @@
 export const config = {
-  API_URL: 'http://api.dev.distrologiq.com',
+  API_URL: 'http://localhost:3000',
 };

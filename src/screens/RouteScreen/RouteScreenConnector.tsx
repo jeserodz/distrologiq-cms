@@ -1,11 +1,8 @@
-import React, { useContext } from "react";
-import { useHistory, useParams } from "react-router";
-import { useQuery, useMutation } from "react-query";
-import { Toaster } from "../../utils/toaster";
-import { RouteScreen } from "./RouteScreen";
-// import { RouteForm } from './RouteScreen.form';
-import { config } from "../../utils/config";
-import { AuthContext } from "../../contexts/AuthContext";
+import React, { useContext } from 'react';
+import { useHistory, useParams } from 'react-router';
+import { useQuery, useMutation } from 'react-query';
+import { Toaster } from '../../utils/toaster';
+import { RouteScreen } from './RouteScreen';
 import {
   RoutesApi,
   MapsApi,
@@ -16,62 +13,41 @@ import {
   DestinationsApi,
   UsersApi,
   SettingsApi,
-} from "distrologiq-sdk";
+} from '../../api';
+import { Context } from '../../Context';
 
 export function RouteScreenConnector() {
   const history = useHistory();
-  const auth = useContext(AuthContext);
+  const context = useContext(Context);
   const { id } = useParams();
+  const routesApi = new RoutesApi(context.getApiConfig());
+  const destinationsApi = new DestinationsApi(context.getApiConfig());
+  const usersApi = new UsersApi(context.getApiConfig());
+  const mapsApi = new MapsApi(context.getApiConfig());
+  const settingsApi = new SettingsApi(context.getApiConfig());
 
-  const routesApi = new RoutesApi({
-    basePath: config.API_URL,
-    accessToken: auth.accessToken!,
-  });
-
-  const destinationsApi = new DestinationsApi({
-    basePath: config.API_URL,
-    accessToken: auth.accessToken!,
-  });
-
-  const usersApi = new UsersApi({
-    basePath: config.API_URL,
-    accessToken: auth.accessToken!,
-  });
-
-  const mapsApi = new MapsApi({
-    basePath: config.API_URL,
-    accessToken: auth.accessToken!,
-  });
-
-  const settingsApi = new SettingsApi({
-    basePath: config.API_URL,
-    accessToken: auth.accessToken!,
-  });
-
-  const { data: route } = useQuery(["fetchRoute", id], (key, id) =>
-    routesApi.routesControllerShow(id)
+  const getRouteResponse = useQuery(['getRoute', id], (key, id) =>
+    routesApi.getRoute(id)
   );
 
-  const { data: destinations } = useQuery("fetchDestinations", () =>
-    destinationsApi.destinationsControllerIndex()
+  const getDestinationsResponse = useQuery('getDestinations', () =>
+    destinationsApi.getDestinations()
   );
 
-  const { data: users } = useQuery("fetchDrivers", () =>
-    usersApi.usersControllerIndex()
-  );
+  const getDriversResponse = useQuery('getDrivers', () => usersApi.getUsers());
 
-  const { data: settings } = useQuery("fetchSettings", () =>
-    settingsApi.settingsControllerIndex()
+  const getSettingsResponse = useQuery('getSettings', () =>
+    settingsApi.getSettings()
   );
 
   const [calculateRoute] = useMutation((data: CalculateRouteDTO) =>
-    mapsApi.mapsControllerCalculateRoute(data)
+    mapsApi.calculateRoute(data)
   );
   const [createRoute] = useMutation((data: CreateRouteDTO) =>
-    routesApi.create(data)
+    routesApi.createRoute(data)
   );
   const [updateRoute] = useMutation((data: UpdateRouteDTO) =>
-    routesApi.routesControllerUpdate(data, id)
+    routesApi.updateRoute(id, data)
   );
 
   async function handleCalculate(routeStops: RouteStop[]) {
@@ -81,22 +57,25 @@ export function RouteScreenConnector() {
 
   async function handleUpdate(data: UpdateRouteDTO) {
     const route = await updateRoute(data);
-    Toaster.show("success", "Ruta actualizada.");
+    Toaster.show('success', 'Ruta actualizada.');
     history.replace(`/dashboard/routes/${route.id}`);
   }
 
   async function handleCreate(data: CreateRouteDTO) {
     const route = await createRoute(data);
-    Toaster.show("success", "Ruta creada.");
+    Toaster.show('success', 'Ruta creada.');
     history.replace(`/dashboard/routes/${route.id}`);
   }
 
-  return route && destinations && users && settings ? (
+  return getRouteResponse.data &&
+    getDestinationsResponse.data &&
+    getDriversResponse.data &&
+    getSettingsResponse.data ? (
     <RouteScreen
-      route={route}
-      destinations={destinations}
-      drivers={users}
-      settings={settings}
+      route={getRouteResponse.data}
+      destinations={getDestinationsResponse.data}
+      drivers={getDriversResponse.data}
+      settings={getSettingsResponse.data}
       calculateFn={handleCalculate}
       onSave={(values) =>
         id

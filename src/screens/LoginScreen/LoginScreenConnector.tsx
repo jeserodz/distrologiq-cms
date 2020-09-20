@@ -1,29 +1,24 @@
 import React, { useContext } from 'react';
 import { useHistory } from 'react-router-dom';
 import { LoginScreen } from './LoginScreen';
-import { AuthApi, SignInDto } from 'distrologiq-sdk';
 import { useMutation } from 'react-query';
-import { AuthContext } from '../../contexts/AuthContext';
-import { config } from '../../utils/config';
+import { Context } from '../../Context';
+import { AuthApi, SignInDto } from '../../api';
 
 export function LoginScreenConnector() {
   const history = useHistory();
-  const auth = useContext(AuthContext);
+  const context = useContext(Context);
 
-  const authApi = new AuthApi({
-    basePath: config.API_URL,
-    accessToken: auth.accessToken!,
-  });
+  const authApi = new AuthApi(context.getApiConfig());
 
-  const [signIn, { data }] = useMutation(async (data: SignInDto) =>
-    authApi.authControllerSignIn(data)
+  const [signIn, signInResponse] = useMutation(async (data: SignInDto) =>
+    authApi.signIn(data)
   );
 
-  if (data) {
-    auth.setAccessToken(data.accessToken);
+  if (signInResponse.data) {
+    context.setAccessToken(signInResponse.data.accessToken);
     history.replace('/dashboard');
   }
 
-  // return <LoginScreen onSubmit={(values) => signIn(values)} />;
   return <LoginScreen onSubmit={(values) => signIn(values)} />;
 }

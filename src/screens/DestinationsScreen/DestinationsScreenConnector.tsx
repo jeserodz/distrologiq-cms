@@ -2,22 +2,18 @@ import React, { useContext } from 'react';
 import { useHistory, useLocation } from 'react-router';
 import { DestinationsScreen } from './DestinationsScreen';
 import { useQuery } from 'react-query';
-import { Destination, DestinationsApi } from 'distrologiq-sdk';
-import { AuthContext } from '../../contexts/AuthContext';
-import { config } from '../../utils/config';
+import { Context } from '../../Context';
+import { DestinationsApi, Destination } from '../../api';
 
 export function DestinationsScreenConnector() {
   const history = useHistory();
   const location = useLocation();
-  const auth = useContext(AuthContext);
+  const context = useContext(Context);
 
-  const destinationsApi = new DestinationsApi({
-    basePath: config.API_URL,
-    accessToken: auth.accessToken!,
-  });
+  const destinationsApi = new DestinationsApi(context.getApiConfig());
 
-  const { data: destinations } = useQuery('fetchDestinations', () =>
-    destinationsApi.destinationsControllerIndex()
+  const fetchDestinationsResponse = useQuery('fetchDestinations', () =>
+    destinationsApi.getDestinations()
   );
 
   function handleDestinationPress(destination: Destination) {
@@ -28,9 +24,9 @@ export function DestinationsScreenConnector() {
     history.push(`${location.pathname}/new`);
   }
 
-  return destinations ? (
+  return fetchDestinationsResponse.data ? (
     <DestinationsScreen
-      destinations={destinations}
+      destinations={fetchDestinationsResponse.data}
       onDestinationPress={handleDestinationPress}
       onCreatePress={handleCreatePress}
     />
