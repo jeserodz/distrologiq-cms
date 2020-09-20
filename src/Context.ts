@@ -26,10 +26,10 @@ export const Context = createContext({
   },
 
   getApiConfig(): Configuration {
-    return {
+    return new Configuration({
       basePath: String(env.config.API_URL),
       accessToken: String(this.accessToken),
-    };
+    });
   },
 
   save() {
