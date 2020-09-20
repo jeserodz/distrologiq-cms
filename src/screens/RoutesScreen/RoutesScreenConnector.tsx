@@ -1,22 +1,18 @@
-import React, { useContext } from 'react';
-import { useHistory } from 'react-router';
-import { RoutesScreen } from './RoutesScreen';
-import { useQuery } from 'react-query';
-import { AuthContext } from '../../contexts/AuthContext';
-import { RoutesApi, Route } from 'distrologiq-sdk';
-import { config } from '../../utils/config';
+import React, { useContext } from "react";
+import { useHistory } from "react-router";
+import { useQuery } from "react-query";
+import { Toaster } from "../../utils/toaster";
+import { RoutesScreen } from "./RoutesScreen";
+import { RoutesApi, Route } from "../../api";
+import { Context } from "../../Context";
 
 export function RoutesScreenConnector() {
   const history = useHistory();
-  const auth = useContext(AuthContext);
+  const context = useContext(Context);
+  const routesApi = new RoutesApi(context.getApiConfig());
 
-  const routesApi = new RoutesApi({
-    basePath: config.API_URL,
-    accessToken: auth.accessToken!,
-  });
-
-  const { data } = useQuery('fetchRoutes', () =>
-    routesApi.routesControllerIndex()
+  const getRoutesResponse = useQuery(["getRoutes"], (key) =>
+    routesApi.getRoutes()
   );
 
   function handleRoutePress(route: Route) {
@@ -24,12 +20,16 @@ export function RoutesScreenConnector() {
   }
 
   function handleCreatePress() {
-    history.push('/dashboard/routes/new');
+    history.push("/dashboard/routes/new");
   }
 
-  return data ? (
+  if (getRoutesResponse.error) {
+    Toaster.show(`error`, getRoutesResponse.error.message);
+  }
+
+  return getRoutesResponse.data ? (
     <RoutesScreen
-      routes={data || []}
+      routes={getRoutesResponse.data}
       onRoutePress={handleRoutePress}
       onCreatePress={handleCreatePress}
     />

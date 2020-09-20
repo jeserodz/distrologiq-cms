@@ -1,12 +1,12 @@
-import React from 'react';
-import styled from 'styled-components';
-import colors from '../../utils/colors';
-import { RouteStop } from 'distrologiq-sdk';
-import { FormControl, InputLabel, Select, MenuItem } from '@material-ui/core';
+import React from "react";
+import styled from "styled-components";
+import colors from "../../utils/colors";
+import { RouteStop, RouteStopTypeEnum } from "../../api";
+import { FormControl, InputLabel, Select, MenuItem } from "@material-ui/core";
 
 interface RouteStopCardProps {
   routeStop: RouteStop;
-  onTypeChange: (routeStop: RouteStop, type: RouteStop.TypeEnum) => any;
+  onTypeChange: (routeStop: RouteStop, type: RouteStopTypeEnum) => any;
 }
 
 const Container = styled.div<{ arrival: boolean }>`
@@ -28,24 +28,24 @@ const Title = styled.div`
 
 export function RouteStopCard({ routeStop, onTypeChange }: RouteStopCardProps) {
   return (
-    <Container arrival={routeStop.type === RouteStop.TypeEnum.ARRIVAL}>
+    <Container arrival={routeStop.type === RouteStopTypeEnum.ARRIVAL}>
       <Title>{routeStop.destination.name}</Title>
-      <FormControl style={{ width: '100%' }}>
+      <FormControl style={{ width: "100%" }}>
         <InputLabel>Tipo de parada</InputLabel>
         <Select
           value={routeStop.type}
           onSelect={() => {}}
           onChange={(event) =>
-            onTypeChange(routeStop, event.target.value as RouteStop.TypeEnum)
+            onTypeChange(routeStop, event.target.value as RouteStopTypeEnum)
           }
-          disabled={routeStop.type === RouteStop.TypeEnum.ARRIVAL}
+          disabled={routeStop.type === RouteStopTypeEnum.ARRIVAL}
         >
-          <MenuItem value={RouteStop.TypeEnum.DELIVERY}>Entrega</MenuItem>
-          <MenuItem value={RouteStop.TypeEnum.PICKUP}>Recogida</MenuItem>
-          <MenuItem value={RouteStop.TypeEnum.DELIVERYPICKUP}>
+          <MenuItem value={RouteStopTypeEnum.DELIVERY}>Entrega</MenuItem>
+          <MenuItem value={RouteStopTypeEnum.PICKUP}>Recogida</MenuItem>
+          <MenuItem value={RouteStopTypeEnum.DELIVERYPICKUP}>
             Entrega y Recogida
           </MenuItem>
-          <MenuItem value={RouteStop.TypeEnum.ARRIVAL}>Llegada</MenuItem>
+          <MenuItem value={RouteStopTypeEnum.ARRIVAL}>Llegada</MenuItem>
         </Select>
       </FormControl>
     </Container>
