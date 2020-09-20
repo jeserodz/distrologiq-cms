@@ -1,51 +1,44 @@
-import React, { useContext } from 'react';
-import { useParams, useHistory } from 'react-router-dom';
-import { useQuery, useMutation } from 'react-query';
-import { UserScreen } from './UserScreen';
-import { UsersApi, CreateUserDTO } from 'distrologiq-sdk';
-import { Toaster } from '../../utils/toaster';
-import { config } from '../../utils/config';
-import { AuthContext } from '../../contexts/AuthContext';
-import { UserForm } from './UserScreen.form';
+import React, { useContext } from "react";
+import { useHistory, useParams } from "react-router";
+import { useQuery, useMutation } from "react-query";
+import { Toaster } from "../../utils/toaster";
+import { UserScreen } from "./UserScreen";
+import { UserForm } from "./UserScreen.form";
+import { UsersApi, CreateUserDTO, User } from "../../api";
+import { Context } from "../../Context";
 
 export function UserScreenConnector() {
-  const { id } = useParams();
   const history = useHistory();
-  const auth = useContext(AuthContext);
+  const context = useContext(Context);
+  const usersApi = new UsersApi(context.getApiConfig());
+  const { id } = useParams();
 
-  const usersApi = new UsersApi({
-    basePath: config.API_URL,
-    accessToken: auth.accessToken!,
-  });
-
-  const { data: user, isLoading } = useQuery('fetchUser', () =>
-    usersApi.usersControllerShow(id)
+  const getUserResponse = useQuery(["getUser", id], (key, id) =>
+    usersApi.getUser(id)
   );
 
   const [createUser] = useMutation((data: CreateUserDTO) =>
-    usersApi.create(data)
+    usersApi.createUser(data)
   );
 
-  const [updateUser] = useMutation((data: any) =>
-    usersApi.usersControllerUpdate(data, id)
-  );
+  const [updateUser] = useMutation((data: any) => usersApi.updateUser(data));
 
   async function handleCreate(values: UserForm) {
     const user = await createUser(values);
-    Toaster.show('success', 'Usuario creado.');
+    Toaster.show("success", "Usuario creado.");
     history.replace(`/dashboard/users/${user.id}`);
   }
 
   async function handleUpdate(data: any) {
     if (!id) return;
-    const user = await updateUser(data);
-    Toaster.show('success', 'Usuario actualizado.');
+    const user = (await updateUser(data)) as User;
+    Toaster.show("success", "Usuario actualizado.");
     history.replace(`/dashboard/users/${user.id}`);
   }
 
-  return (
+  return getUserResponse.data ? (
     <UserScreen
-      user={user}
+      user={getUserResponse.data}
       onSubmit={(data) =>
         id ? handleUpdate(data as any) : handleCreate(data as any)
       }
@@ -54,5 +47,5 @@ export function UserScreenConnector() {
         history.push(`/dashboard/users/${user.id}/analytics`);
       }}
     />
-  );
+  ) : null;
 }

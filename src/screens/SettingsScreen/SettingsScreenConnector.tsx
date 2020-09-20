@@ -1,30 +1,27 @@
-import React, { useContext } from 'react';
-import { SettingsScreen } from './SettingsScreen';
-import { SettingsForm } from './SettingsForm';
-import { Toaster } from '../../utils/toaster';
-import { useQuery, useMutation } from 'react-query';
-import { SettingsApi, SetSettingsDTO } from 'distrologiq-sdk';
-import { config } from '../../utils/config';
-import { AuthContext } from '../../contexts/AuthContext';
+import React, { useContext } from "react";
+import { useHistory } from "react-router";
+import { useQuery, useMutation } from "react-query";
+import { Toaster } from "../../utils/toaster";
+import { SettingsScreen } from "./SettingsScreen";
+import { SettingsForm } from "./SettingsForm";
+import { SettingsApi, SetSettingsDTO } from "../../api";
+import { Context } from "../../Context";
 
 export function SettingsScreenConnector() {
-  const auth = useContext(AuthContext);
+  const history = useHistory();
+  const context = useContext(Context);
+  const settingsApi = new SettingsApi(context.getApiConfig());
 
-  const settingsApi = new SettingsApi({
-    basePath: config.API_URL,
-    accessToken: auth.accessToken!,
-  });
-
-  const { data, refetch } = useQuery('fetchSettings', () =>
-    settingsApi.settingsControllerIndex()
+  const getSettingsResponse = useQuery(["getSettings"], (key) =>
+    settingsApi.getSettings()
   );
 
   const [setSettings] = useMutation(
-    (data: SetSettingsDTO) => settingsApi.settingsControllerSetSettings(data),
+    (data: SetSettingsDTO) => settingsApi.updateSettings(data),
     {
       onSuccess: () => {
-        Toaster.show('success', 'Cambios guardados.');
-        refetch();
+        Toaster.show("success", "Cambios guardados.");
+        getSettingsResponse.refetch();
       },
     }
   );
@@ -33,13 +30,13 @@ export function SettingsScreenConnector() {
     setSettings(data);
   }
 
-  return data ? (
+  return getSettingsResponse.data ? (
     <SettingsScreen
       settings={{
-        name: data.name,
-        avgLoadTime: data.avgLoadTime,
-        latitude: data.destination.latitude,
-        longitude: data.destination.longitude,
+        name: getSettingsResponse.data.name,
+        avgLoadTime: getSettingsResponse.data.avgLoadTime,
+        latitude: getSettingsResponse.data.destination.latitude,
+        longitude: getSettingsResponse.data.destination.longitude,
       }}
       onSubmit={handleSubmit}
     />

@@ -1,8 +1,8 @@
-import React from 'react';
-import { Paper, TextField } from '@material-ui/core';
-import { List, ListItem, ListItemText } from '@material-ui/core';
-import { Place } from 'distrologiq-sdk';
-import './PlacesSearch.css';
+import React from "react";
+import { Paper, TextField } from "@material-ui/core";
+import { List, ListItem, ListItemText } from "@material-ui/core";
+import { Place } from "../../api";
+import "./PlacesSearch.css";
 
 export interface PlacesSearchProps {
   places: Place[];
@@ -12,7 +12,7 @@ export interface PlacesSearchProps {
 }
 
 export function PlacesSearch(props: PlacesSearchProps) {
-  const [searchText, setSearchText] = React.useState('');
+  const [searchText, setSearchText] = React.useState("");
 
   function handleChange(value: string) {
     setSearchText(value);
@@ -21,7 +21,7 @@ export function PlacesSearch(props: PlacesSearchProps) {
 
   function handleClick(place: Place) {
     props.onClick(place);
-    setSearchText('');
+    setSearchText("");
   }
 
   return (

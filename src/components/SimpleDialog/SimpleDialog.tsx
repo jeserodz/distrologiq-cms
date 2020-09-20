@@ -9,7 +9,7 @@ import {
 import { makeStyles } from "@material-ui/core/styles";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { User } from "distrologiq-sdk";
+import { User } from "../../api";
 
 export interface SimpleDialogProps {
   user?: User | undefined;

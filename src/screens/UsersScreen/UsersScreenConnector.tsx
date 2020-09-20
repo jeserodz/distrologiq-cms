@@ -1,24 +1,17 @@
 import React, { useContext } from "react";
 import { useHistory, useLocation } from "react-router";
-import { UsersScreen } from "./UsersScreen";
 import { useQuery } from "react-query";
-import { User, UsersApi } from "distrologiq-sdk";
-import { AuthContext } from "../../contexts/AuthContext";
-import { config } from "../../utils/config";
+import { UsersScreen } from "./UsersScreen";
+import { UsersApi, User } from "../../api";
+import { Context } from "../../Context";
 
 export function UsersScreenConnector() {
   const history = useHistory();
   const location = useLocation();
-  const auth = useContext(AuthContext);
+  const context = useContext(Context);
+  const usersApi = new UsersApi(context.getApiConfig());
 
-  const usersApi = new UsersApi({
-    basePath: config.API_URL,
-    accessToken: auth.accessToken!,
-  });
-
-  const { data: users } = useQuery("fetchUsers", () =>
-    usersApi.usersControllerIndex()
-  );
+  const getUsersResponse = useQuery(["getUsers"], (key) => usersApi.getUsers());
 
   function handleUserPress(user: User) {
     history.push(`${location.pathname}/${user.id}`);
@@ -28,9 +21,9 @@ export function UsersScreenConnector() {
     history.push(`${location.pathname}/new`);
   }
 
-  return users ? (
+  return getUsersResponse.data ? (
     <UsersScreen
-      users={users}
+      users={getUsersResponse.data}
       onUserPress={handleUserPress}
       onCreatePress={handleCreatePress}
     />
