@@ -48,7 +48,7 @@ export interface GetRouteRequest {
     id: number;
 }
 
-export interface GetRouteStopsRequest {
+export interface GetRouteStopRequest {
     id: number;
 }
 
@@ -195,9 +195,9 @@ export class RoutesApi extends runtime.BaseAPI {
 
     /**
      */
-    async getRouteStopsRaw(requestParameters: GetRouteStopsRequest): Promise<runtime.ApiResponse<RouteStop>> {
+    async getRouteStopRaw(requestParameters: GetRouteStopRequest): Promise<runtime.ApiResponse<RouteStop>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
-            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling getRouteStops.');
+            throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling getRouteStop.');
         }
 
         const queryParameters: any = {};
@@ -224,8 +224,8 @@ export class RoutesApi extends runtime.BaseAPI {
 
     /**
      */
-    async getRouteStops(id: number): Promise<RouteStop> {
-        const response = await this.getRouteStopsRaw({ id: id });
+    async getRouteStop(id: number): Promise<RouteStop> {
+        const response = await this.getRouteStopRaw({ id: id });
         return await response.value();
     }
 

@@ -1,5 +1,4 @@
 import React, { useContext } from "react";
-import { useHistory } from "react-router";
 import { useQuery, useMutation } from "react-query";
 import { Toaster } from "../../utils/toaster";
 import { SettingsScreen } from "./SettingsScreen";
@@ -8,7 +7,6 @@ import { SettingsApi, SetSettingsDTO } from "../../api";
 import { Context } from "../../Context";
 
 export function SettingsScreenConnector() {
-  const history = useHistory();
   const context = useContext(Context);
   const settingsApi = new SettingsApi(context.getApiConfig());
 

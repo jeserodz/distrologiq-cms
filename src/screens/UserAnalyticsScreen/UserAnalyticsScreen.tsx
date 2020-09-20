@@ -1,30 +1,29 @@
-import React, { useContext } from 'react';
-import { useParams, useHistory } from 'react-router-dom';
-import { useQuery, useMutation } from 'react-query';
-import { AuthContext } from '../../contexts/AuthContext';
+import React from "react";
+import { useParams } from "react-router-dom";
+import { useQuery } from "react-query";
 import { Typography, Paper, Grid, Box } from '@material-ui/core'; // prettier-ignore
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts'; // prettier-ignore
-import { AnalyticsService, UserAnalyticsDTO } from '../../api';
-import Axios from 'axios';
+import { UserAnalyticsDTO } from "../../api";
+import Axios from "axios";
 
 const sampleData = [
   {
-    name: 'Ruta A',
+    name: "Ruta A",
     duration: 4000,
     completedDuration: 2400,
   },
   {
-    name: 'Ruta B',
+    name: "Ruta B",
     duration: 3000,
     completedDuration: 1398,
   },
   {
-    name: 'Ruta B',
+    name: "Ruta B",
     duration: 2000,
     completedDuration: 9800,
   },
   {
-    name: 'Ruta C',
+    name: "Ruta C",
     duration: 2780,
     completedDuration: 3908,
   },
@@ -34,9 +33,9 @@ export function UserAnalyticsScreen() {
   const { id } = useParams();
   const [chartWidth, setChartWidth] = React.useState(0);
 
-  const { data } = useQuery(['getUserAnalytics', id], async () => {
+  const { data } = useQuery(["getUserAnalytics", id], async () => {
     const { data } = await Axios.get<UserAnalyticsDTO>(
-      'http://localhost:3000/analytics/users/' + id
+      "http://localhost:3000/analytics/users/" + id
     );
     return data;
   });

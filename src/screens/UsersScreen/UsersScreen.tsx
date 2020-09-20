@@ -2,7 +2,7 @@ import React from "react";
 import { Paper, Table, TableHead, Typography } from "@material-ui/core";
 import { TableRow, TableCell, TableBody } from "@material-ui/core";
 import { renderRoles } from "../../utils/render-roles";
-import { User } from "distrologiq-sdk";
+import { User } from "../../api";
 
 export interface UsersScreenProps {
   users: User[];

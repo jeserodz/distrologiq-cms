@@ -21,3 +21,4 @@ export * from './UpdateRouteDTO';
 export * from './User';
 export * from './UserAnalyticsDTO';
 export * from './UserAnalyticsDTOUser';
+export * from './UserRoles';

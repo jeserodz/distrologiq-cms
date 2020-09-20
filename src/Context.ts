@@ -1,7 +1,8 @@
-import { createContext } from 'react';
-import { Configuration, AuthApi } from './api';
+import { createContext } from "react";
+import { Configuration, AuthApi } from "./api";
 
-const env = window as any;
+// @ts-ignore
+const env = window.env as any;
 
 export const Context = createContext({
   loggedIn: true as boolean,
@@ -27,17 +28,17 @@ export const Context = createContext({
 
   getApiConfig(): Configuration {
     return new Configuration({
-      basePath: String(env.config.API_URL),
+      basePath: String(env.API_URL),
       accessToken: String(this.accessToken),
     });
   },
 
   save() {
-    localStorage.setItem('AppContext', JSON.stringify(this));
+    localStorage.setItem("AppContext", JSON.stringify(this));
   },
 
   load() {
-    const ctx = JSON.parse(localStorage.getItem('AppContext') || '{}');
+    const ctx = JSON.parse(localStorage.getItem("AppContext") || "{}");
     if (ctx.loggedIn) this.setLoggedIn(ctx.loggedIn);
     if (ctx.accessToken) this.setAccessToken(ctx.accessToken);
   },
