@@ -1,13 +1,13 @@
-import React from 'react';
-import { Paper, Table, TableHead, Typography, Fab } from '@material-ui/core';
-import { TableRow, TableCell, TableBody } from '@material-ui/core';
-import { Add } from '@material-ui/icons';
-import { Route } from 'distrologiq-sdk';
+import React from "react";
+import { Paper, Table, TableHead, Typography, Fab } from "@material-ui/core";
+import { TableRow, TableCell, TableBody } from "@material-ui/core";
+import { Add } from "@material-ui/icons";
+import { Route } from "../../api";
 import {
   displayDistance,
   displayDuration,
   displayRoutePerformance,
-} from '../../utils/display-helpers';
+} from "../../utils/display-helpers";
 
 export interface RoutesScreenProps {
   routes: Route[];
@@ -46,10 +46,10 @@ export function RoutesScreen(props: RoutesScreenProps) {
                 <TableCell>{route.name}</TableCell>
                 <TableCell>{route.stops.length}</TableCell>
                 <TableCell>{displayDistance(route.distance)}</TableCell>
-                <TableCell>{route.started ? 'Si' : 'No'}</TableCell>
-                <TableCell>{route.completed ? 'Si' : 'No'}</TableCell>
+                <TableCell>{route.started ? "Si" : "No"}</TableCell>
+                <TableCell>{route.completed ? "Si" : "No"}</TableCell>
                 <TableCell>
-                  {route.driver ? route.driver.displayName : 'Sin Asignar'}
+                  {route.driver ? route.driver.displayName : "Sin Asignar"}
                 </TableCell>
                 <TableCell>{displayDuration(route.duration)}</TableCell>
                 <TableCell>

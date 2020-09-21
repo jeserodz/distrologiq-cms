@@ -13,6 +13,13 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import {
+    UserRoles,
+    UserRolesFromJSON,
+    UserRolesFromJSONTyped,
+    UserRolesToJSON,
+} from './';
+
 /**
  * 
  * @export
@@ -51,10 +58,10 @@ export interface User {
     email?: string;
     /**
      * 
-     * @type {object}
+     * @type {UserRoles}
      * @memberof User
      */
-    roles: object;
+    roles: UserRoles;
     /**
      * 
      * @type {string}
@@ -84,7 +91,7 @@ export function UserFromJSONTyped(json: any, ignoreDiscriminator: boolean): User
         'displayName': json['displayName'],
         'password': json['password'],
         'email': !exists(json, 'email') ? undefined : json['email'],
-        'roles': json['roles'],
+        'roles': UserRolesFromJSON(json['roles']),
         'createdAt': json['createdAt'],
         'updatedAt': json['updatedAt'],
     };
@@ -104,7 +111,7 @@ export function UserToJSON(value?: User | null): any {
         'displayName': value.displayName,
         'password': value.password,
         'email': value.email,
-        'roles': value.roles,
+        'roles': UserRolesToJSON(value.roles),
         'createdAt': value.createdAt,
         'updatedAt': value.updatedAt,
     };

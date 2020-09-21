@@ -1,4 +1,4 @@
-import { User } from "distrologiq-sdk";
+import { User } from "../api";
 
 export function renderRoles(user: User) {
   const roles = [];

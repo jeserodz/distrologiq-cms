@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Typography,
   Paper,
@@ -10,16 +10,13 @@ import {
   TextField,
   Checkbox,
   FormControlLabel,
-  FormGroup,
-  FormLabel,
   TableHead,
-  Dialog,
-} from '@material-ui/core';
-import { Formik } from 'formik';
-import { User } from 'distrologiq-sdk';
-import { formSchema, initialValues } from './UserScreen.form';
-import { SimpleDialog } from '../../components/SimpleDialog';
-import colors from '../../utils/colors';
+} from "@material-ui/core";
+import { Formik } from "formik";
+import { User } from "../../api";
+import { formSchema, initialValues } from "./UserScreen.form";
+import { SimpleDialog } from "../../components/SimpleDialog";
+import colors from "../../utils/colors";
 
 export interface UserScreenProps {
   user: User | undefined;
@@ -65,7 +62,7 @@ export function UserScreen(props: UserScreenProps) {
                         <TableCell
                           style={{
                             backgroundColor: colors.primaryDark,
-                            color: 'white',
+                            color: "white",
                           }}
                           colSpan={2}
                         >
@@ -129,7 +126,7 @@ export function UserScreen(props: UserScreenProps) {
                         <TableCell
                           style={{
                             backgroundColor: colors.primaryDark,
-                            color: 'white',
+                            color: "white",
                           }}
                           colSpan={2}
                         >

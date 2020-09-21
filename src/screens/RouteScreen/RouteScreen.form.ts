@@ -1,5 +1,5 @@
-import * as Yup from 'yup';
-import { RouteStop, RouteGeometry, User } from 'distrologiq-sdk';
+import * as Yup from "yup";
+import { RouteStop, RouteGeometry, User, RouteStopTypeEnum } from "../../api";
 
 export interface RouteForm {
   name: string;
@@ -14,7 +14,7 @@ export interface RouteForm {
 }
 
 export const initialValues: RouteForm = {
-  name: '',
+  name: "",
   stops: [],
   driver: undefined,
   distance: 0,
@@ -26,11 +26,11 @@ export const initialValues: RouteForm = {
 };
 
 export const formSchema = Yup.object().shape({
-  name: Yup.string().required('Campo requerido'),
+  name: Yup.string().required("Campo requerido"),
   stops: Yup.array()
     .of(
       Yup.object().shape({
-        type: Yup.mixed<RouteStop.TypeEnum>().required(),
+        type: Yup.mixed<RouteStopTypeEnum>().required(),
         destination: Yup.object().required(),
         started: Yup.date().nullable(),
         completed: Yup.date().nullable(),

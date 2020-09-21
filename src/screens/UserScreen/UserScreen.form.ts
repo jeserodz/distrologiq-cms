@@ -1,5 +1,5 @@
 import * as Yup from "yup";
-import { User } from "distrologiq-sdk";
+import { User } from "../../api";
 
 export type UserForm = Yup.InferType<typeof formSchema>;
 
@@ -18,5 +18,8 @@ export const initialValues: Partial<User> = {
   displayName: "",
   email: "",
   password: "",
-  roles: [],
+  roles: {
+    admin: true,
+    driver: true,
+  },
 };
