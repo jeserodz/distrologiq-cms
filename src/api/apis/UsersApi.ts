@@ -18,6 +18,9 @@ import {
     CreateUserDTO,
     CreateUserDTOFromJSON,
     CreateUserDTOToJSON,
+    UpdateUserDTO,
+    UpdateUserDTOFromJSON,
+    UpdateUserDTOToJSON,
     User,
     UserFromJSON,
     UserToJSON,
@@ -37,6 +40,7 @@ export interface RemoveUserRequest {
 
 export interface UpdateUserRequest {
     id: number;
+    updateUserDTO: UpdateUserDTO;
 }
 
 /**
@@ -205,14 +209,20 @@ export class UsersApi extends runtime.BaseAPI {
 
     /**
      */
-    async updateUserRaw(requestParameters: UpdateUserRequest): Promise<runtime.ApiResponse<object>> {
+    async updateUserRaw(requestParameters: UpdateUserRequest): Promise<runtime.ApiResponse<User>> {
         if (requestParameters.id === null || requestParameters.id === undefined) {
             throw new runtime.RequiredError('id','Required parameter requestParameters.id was null or undefined when calling updateUser.');
+        }
+
+        if (requestParameters.updateUserDTO === null || requestParameters.updateUserDTO === undefined) {
+            throw new runtime.RequiredError('updateUserDTO','Required parameter requestParameters.updateUserDTO was null or undefined when calling updateUser.');
         }
 
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
+
+        headerParameters['Content-Type'] = 'application/json';
 
         if (this.configuration && this.configuration.accessToken) {
             const token = this.configuration.accessToken;
@@ -227,15 +237,16 @@ export class UsersApi extends runtime.BaseAPI {
             method: 'PATCH',
             headers: headerParameters,
             query: queryParameters,
+            body: UpdateUserDTOToJSON(requestParameters.updateUserDTO),
         });
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => UserFromJSON(jsonValue));
     }
 
     /**
      */
-    async updateUser(id: number): Promise<object> {
-        const response = await this.updateUserRaw({ id: id });
+    async updateUser(id: number, updateUserDTO: UpdateUserDTO): Promise<User> {
+        const response = await this.updateUserRaw({ id: id, updateUserDTO: updateUserDTO });
         return await response.value();
     }
 

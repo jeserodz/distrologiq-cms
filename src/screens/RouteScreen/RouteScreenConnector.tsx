@@ -1,87 +1,168 @@
 import React, { useContext } from 'react';
-import { useHistory, useParams } from 'react-router';
+import { RouteComponentProps, useNavigate, useParams } from '@reach/router';
 import { useQuery, useMutation } from 'react-query';
+import { AxiosError } from 'axios';
 import { Toaster } from '../../utils/toaster';
 import { RouteScreen } from './RouteScreen';
+import { Context } from '../../Context';
 import {
-  RoutesApi,
-  MapsApi,
   CalculateRouteDTO,
   CreateRouteDTO,
   UpdateRouteDTO,
   RouteStop,
-  DestinationsApi,
-  UsersApi,
-  SettingsApi,
+  Route,
+  Destination,
+  User,
+  Settings,
+  CalculateRouteResponse,
 } from '../../api';
-import { Context } from '../../Context';
 
-export function RouteScreenConnector() {
-  const history = useHistory();
-  const context = useContext(Context);
+export function RouteScreenConnector(props: RouteComponentProps) {
   const { id } = useParams();
-  const routesApi = new RoutesApi(context.getApiConfig());
-  const destinationsApi = new DestinationsApi(context.getApiConfig());
-  const usersApi = new UsersApi(context.getApiConfig());
-  const mapsApi = new MapsApi(context.getApiConfig());
-  const settingsApi = new SettingsApi(context.getApiConfig());
+  const navigate = useNavigate();
+  const context = useContext(Context);
+  const api = context.getApi();
 
-  const getRouteResponse = useQuery(['getRoute', id], (key, id) =>
-    routesApi.getRoute(id)
+  const getRoute = useQuery(
+    ['getRoute', id],
+    async (key, id) => {
+      const response = await api.get(`/routes/${id}`);
+      return response.data as Route;
+    },
+    {
+      enabled: id !== 'new',
+      onError: (error: AxiosError) => {
+        Toaster.show('error', error.response?.data.message || error.message);
+      },
+    }
   );
 
-  const getDestinationsResponse = useQuery('getDestinations', () =>
-    destinationsApi.getDestinations()
+  const getDestinations = useQuery(
+    'getDestinations',
+    async () => {
+      const response = await api.get('/destinations');
+      return response.data as Destination[];
+    },
+    {
+      onError: (error: AxiosError) => {
+        Toaster.show('error', error.response?.data.message || error.message);
+      },
+    }
   );
 
-  const getDriversResponse = useQuery('getDrivers', () => usersApi.getUsers());
-
-  const getSettingsResponse = useQuery('getSettings', () =>
-    settingsApi.getSettings()
+  const getDrivers = useQuery(
+    'getDrivers',
+    async () => {
+      const response = await api.get('/users');
+      return response.data as User[];
+    },
+    {
+      onError: (error: AxiosError) => {
+        Toaster.show('error', error.response?.data.message || error.message);
+      },
+    }
   );
 
-  const [calculateRoute] = useMutation((data: CalculateRouteDTO) =>
-    mapsApi.calculateRoute(data)
-  );
-  const [createRoute] = useMutation((data: CreateRouteDTO) =>
-    routesApi.createRoute(data)
-  );
-  const [updateRoute] = useMutation((data: UpdateRouteDTO) =>
-    routesApi.updateRoute(id, data)
+  const getSettings = useQuery(
+    'getSettings',
+    async () => {
+      const response = await api.get('/settings');
+      return response.data as Settings;
+    },
+    {
+      onError: (error: AxiosError) => {
+        Toaster.show('error', error.response?.data.message || error.message);
+      },
+    }
   );
 
-  async function handleCalculate(routeStops: RouteStop[]) {
-    const data = await calculateRoute({ routeStops });
-    return data;
+  const [calculateRoute] = useMutation(
+    async (data: CalculateRouteDTO) => {
+      const response = await api.post('/maps/calculateRoute', data);
+      return response.data as CalculateRouteResponse;
+    },
+    {
+      onSuccess: () => {
+        Toaster.show('success', 'Ruta optimizada');
+      },
+      onError: (error: AxiosError) => {
+        Toaster.show('error', error.response?.data.message || error.message);
+      },
+    }
+  );
+
+  const [createRoute] = useMutation(
+    async (data: CreateRouteDTO) => {
+      const response = await api.post('/routes', data);
+      return response.data as Route;
+    },
+    {
+      onError: (error: AxiosError) => {
+        Toaster.show('error', error.response?.data.message || error.message);
+      },
+    }
+  );
+
+  const [updateRoute] = useMutation(
+    async (data: UpdateRouteDTO) => {
+      const response = await api.patch(`/routes/${id}`, data);
+      return response.data as Route;
+    },
+    {
+      onError: (error: AxiosError) => {
+        Toaster.show('error', error.response?.data.message || error.message);
+      },
+    }
+  );
+
+  const [deleteRoute] = useMutation(
+    async () => {
+      await api.delete(`/routes/${id}`);
+    },
+    {
+      onError: (error: AxiosError) => {
+        Toaster.show('error', error.response?.data.message || error.message);
+      },
+      onSuccess: () => {
+        Toaster.show('success', 'Ruta eliminada.');
+        navigate(`/dashboard/routes`, { replace: true });
+      },
+    }
+  );
+
+  async function handleCalculate(data: CalculateRouteDTO) {
+    const result = await calculateRoute(data);
+    return result;
   }
 
   async function handleUpdate(data: UpdateRouteDTO) {
     const route = await updateRoute(data);
     Toaster.show('success', 'Ruta actualizada.');
-    history.replace(`/dashboard/routes/${route.id}`);
+    navigate(`/dashboard/routes/${route.id}`, { replace: true });
   }
 
   async function handleCreate(data: CreateRouteDTO) {
     const route = await createRoute(data);
     Toaster.show('success', 'Ruta creada.');
-    history.replace(`/dashboard/routes/${route.id}`);
+    navigate(`/dashboard/routes/${route.id}`, { replace: true });
   }
 
-  return getRouteResponse.data &&
-    getDestinationsResponse.data &&
-    getDriversResponse.data &&
-    getSettingsResponse.data ? (
+  return (id === 'new' || getRoute.data) &&
+    getDestinations.data &&
+    getDrivers.data &&
+    getSettings.data ? (
     <RouteScreen
-      route={getRouteResponse.data}
-      destinations={getDestinationsResponse.data}
-      drivers={getDriversResponse.data}
-      settings={getSettingsResponse.data}
+      route={getRoute.data}
+      destinations={getDestinations.data}
+      drivers={getDrivers.data}
+      settings={getSettings.data}
       calculateFn={handleCalculate}
       onSave={(values) =>
-        id
-          ? handleUpdate(values as UpdateRouteDTO)
-          : handleCreate(values as CreateRouteDTO)
+        id === 'new'
+          ? handleCreate(values as CreateRouteDTO)
+          : handleUpdate(values as UpdateRouteDTO)
       }
+      onDelete={deleteRoute}
     />
   ) : null;
 }

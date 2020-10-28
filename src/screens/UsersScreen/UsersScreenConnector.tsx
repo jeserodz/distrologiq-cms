@@ -1,24 +1,23 @@
-import React, { useContext } from "react";
-import { useHistory, useLocation } from "react-router";
-import { useQuery } from "react-query";
-import { UsersScreen } from "./UsersScreen";
-import { UsersApi, User } from "../../api";
-import { Context } from "../../Context";
+import React, { useContext } from 'react';
+import { RouteComponentProps, useNavigate } from '@reach/router';
+import { useQuery } from 'react-query';
+import { UsersScreen } from './UsersScreen';
+import { UsersApi, User } from '../../api';
+import { Context } from '../../Context';
 
-export function UsersScreenConnector() {
-  const history = useHistory();
-  const location = useLocation();
+export function UsersScreenConnector(props: RouteComponentProps) {
+  const navigate = useNavigate();
   const context = useContext(Context);
   const usersApi = new UsersApi(context.getApiConfig());
 
-  const getUsersResponse = useQuery(["getUsers"], (key) => usersApi.getUsers());
+  const getUsersResponse = useQuery(['getUsers'], (key) => usersApi.getUsers());
 
   function handleUserPress(user: User) {
-    history.push(`${location.pathname}/${user.id}`);
+    navigate(`./users/${user.id}`);
   }
 
   function handleCreatePress() {
-    history.push(`${location.pathname}/new`);
+    navigate(`./users/new`);
   }
 
   return getUsersResponse.data ? (

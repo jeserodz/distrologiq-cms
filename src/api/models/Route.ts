@@ -66,6 +66,18 @@ export interface Route {
     durationWithLoadTime: number;
     /**
      * 
+     * @type {Date}
+     * @memberof Route
+     */
+    estimatedStartDate: Date;
+    /**
+     * 
+     * @type {Date}
+     * @memberof Route
+     */
+    estimatedEndDate: Date;
+    /**
+     * 
      * @type {RouteGeometry}
      * @memberof Route
      */
@@ -112,6 +124,12 @@ export interface Route {
      * @memberof Route
      */
     updatedAt: Date;
+    /**
+     * 
+     * @type {number}
+     * @memberof Route
+     */
+    avgLoadTime: number;
 }
 
 export function RouteFromJSON(json: any): Route {
@@ -129,6 +147,8 @@ export function RouteFromJSONTyped(json: any, ignoreDiscriminator: boolean): Rou
         'distance': json['distance'],
         'duration': json['duration'],
         'durationWithLoadTime': json['durationWithLoadTime'],
+        'estimatedStartDate': (new Date(json['estimatedStartDate'])),
+        'estimatedEndDate': (new Date(json['estimatedEndDate'])),
         'geometry': RouteGeometryFromJSON(json['geometry']),
         'started': (new Date(json['started'])),
         'completed': (new Date(json['completed'])),
@@ -137,6 +157,7 @@ export function RouteFromJSONTyped(json: any, ignoreDiscriminator: boolean): Rou
         'driver': UserFromJSON(json['driver']),
         'createdAt': (new Date(json['createdAt'])),
         'updatedAt': (new Date(json['updatedAt'])),
+        'avgLoadTime': json['avgLoadTime'],
     };
 }
 
@@ -154,6 +175,8 @@ export function RouteToJSON(value?: Route | null): any {
         'distance': value.distance,
         'duration': value.duration,
         'durationWithLoadTime': value.durationWithLoadTime,
+        'estimatedStartDate': (value.estimatedStartDate.toISOString()),
+        'estimatedEndDate': (value.estimatedEndDate.toISOString()),
         'geometry': RouteGeometryToJSON(value.geometry),
         'started': (value.started.toISOString()),
         'completed': (value.completed.toISOString()),
@@ -162,6 +185,7 @@ export function RouteToJSON(value?: Route | null): any {
         'driver': UserToJSON(value.driver),
         'createdAt': (value.createdAt.toISOString()),
         'updatedAt': (value.updatedAt.toISOString()),
+        'avgLoadTime': value.avgLoadTime,
     };
 }
 

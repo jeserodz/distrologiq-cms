@@ -13,13 +13,6 @@
  */
 
 import { exists, mapValues } from '../runtime';
-import {
-    RouteStop,
-    RouteStopFromJSON,
-    RouteStopFromJSONTyped,
-    RouteStopToJSON,
-} from './';
-
 /**
  * 
  * @export
@@ -28,10 +21,22 @@ import {
 export interface CalculateRouteDTO {
     /**
      * 
-     * @type {Array<RouteStop>}
+     * @type {Array<object>}
      * @memberof CalculateRouteDTO
      */
-    routeStops: Array<RouteStop>;
+    routeStops: Array<object>;
+    /**
+     * 
+     * @type {Date}
+     * @memberof CalculateRouteDTO
+     */
+    estimatedStartDate: Date;
+    /**
+     * 
+     * @type {number}
+     * @memberof CalculateRouteDTO
+     */
+    avgLoadTime: number;
 }
 
 export function CalculateRouteDTOFromJSON(json: any): CalculateRouteDTO {
@@ -44,7 +49,9 @@ export function CalculateRouteDTOFromJSONTyped(json: any, ignoreDiscriminator: b
     }
     return {
         
-        'routeStops': ((json['routeStops'] as Array<any>).map(RouteStopFromJSON)),
+        'routeStops': json['routeStops'],
+        'estimatedStartDate': (new Date(json['estimatedStartDate'])),
+        'avgLoadTime': json['avgLoadTime'],
     };
 }
 
@@ -57,7 +64,9 @@ export function CalculateRouteDTOToJSON(value?: CalculateRouteDTO | null): any {
     }
     return {
         
-        'routeStops': ((value.routeStops as Array<any>).map(RouteStopToJSON)),
+        'routeStops': value.routeStops,
+        'estimatedStartDate': (value.estimatedStartDate.toISOString()),
+        'avgLoadTime': value.avgLoadTime,
     };
 }
 

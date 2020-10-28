@@ -36,25 +36,25 @@ export interface Destination {
      * @type {string}
      * @memberof Destination
      */
-    email: string;
+    code?: string;
     /**
      * 
      * @type {string}
      * @memberof Destination
      */
-    phone: string;
+    email?: string;
     /**
      * 
      * @type {string}
      * @memberof Destination
      */
-    code: string;
+    phone?: string;
     /**
      * 
      * @type {string}
      * @memberof Destination
      */
-    references: string;
+    references?: string;
     /**
      * 
      * @type {number}
@@ -99,10 +99,10 @@ export function DestinationFromJSONTyped(json: any, ignoreDiscriminator: boolean
         
         'id': json['id'],
         'name': json['name'],
-        'email': json['email'],
-        'phone': json['phone'],
-        'code': json['code'],
-        'references': json['references'],
+        'code': !exists(json, 'code') ? undefined : json['code'],
+        'email': !exists(json, 'email') ? undefined : json['email'],
+        'phone': !exists(json, 'phone') ? undefined : json['phone'],
+        'references': !exists(json, 'references') ? undefined : json['references'],
         'longitude': json['longitude'],
         'latitude': json['latitude'],
         'isOwnCompany': json['isOwnCompany'],
@@ -122,9 +122,9 @@ export function DestinationToJSON(value?: Destination | null): any {
         
         'id': value.id,
         'name': value.name,
+        'code': value.code,
         'email': value.email,
         'phone': value.phone,
-        'code': value.code,
         'references': value.references,
         'longitude': value.longitude,
         'latitude': value.latitude,

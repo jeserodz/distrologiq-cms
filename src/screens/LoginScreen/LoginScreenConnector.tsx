@@ -1,24 +1,23 @@
 import React, { useContext } from 'react';
-import { useHistory } from 'react-router-dom';
+import { RouteComponentProps, useNavigate } from '@reach/router';
 import { LoginScreen } from './LoginScreen';
 import { useMutation } from 'react-query';
 import { Context } from '../../Context';
 import { AuthApi, SignInDto } from '../../api';
 
-export function LoginScreenConnector() {
-  const history = useHistory();
+export function LoginScreenConnector(props: RouteComponentProps) {
+  const navigate = useNavigate();
   const context = useContext(Context);
 
   const authApi = new AuthApi(context.getApiConfig());
 
-  const [signIn, signInResponse] = useMutation(async (data: SignInDto) =>
-    authApi.signIn(data)
-  );
-
-  if (signInResponse.data) {
-    context.setAccessToken(signInResponse.data.accessToken);
-    history.replace('/dashboard');
-  }
+  const [signIn] = useMutation(async (data: SignInDto) => {
+    const { accessToken } = await authApi.signIn(data);
+    context.setAccessToken(accessToken);
+    context.setLoggedIn(true);
+    context.save();
+    navigate('/dashboard', { replace: true });
+  });
 
   return <LoginScreen onSubmit={(values) => signIn(values)} />;
 }

@@ -1,47 +1,41 @@
-import * as Yup from "yup";
-import { RouteStop, RouteGeometry, User, RouteStopTypeEnum } from "../../api";
+import * as Yup from 'yup';
+import { CreateRouteDTO, UpdateRouteDTO } from '../../api';
 
-export interface RouteForm {
-  name: string;
-  stops: RouteStop[];
-  driver?: User | undefined;
-  distance: number;
-  duration: number;
-  durationWithLoadTime: number;
-  geometry: RouteGeometry | undefined;
-  started?: Date | undefined;
-  completed?: Date | undefined;
-}
+export type RouteScreenForm = CreateRouteDTO | UpdateRouteDTO;
 
-export const initialValues: RouteForm = {
-  name: "",
+export const initialValues: any = {
+  name: '',
   stops: [],
   driver: undefined,
-  distance: 0,
-  duration: 0,
-  durationWithLoadTime: 0,
+  avgLoadTime: 0,
+  estimatedStartDate: null,
+  estimatedEndDate: null,
+  distance: undefined,
+  duration: undefined,
+  durationWithLoadTime: undefined,
   geometry: undefined,
   started: undefined,
   completed: undefined,
 };
 
 export const formSchema = Yup.object().shape({
-  name: Yup.string().required("Campo requerido"),
+  name: Yup.string().required('Campo requerido').nullable(),
   stops: Yup.array()
     .of(
       Yup.object().shape({
-        type: Yup.mixed<RouteStopTypeEnum>().required(),
+        type: Yup.mixed().required(),
         destination: Yup.object().required(),
-        started: Yup.date().nullable(),
-        completed: Yup.date().nullable(),
       })
     )
     .min(1)
     .required(),
   driver: Yup.mixed().nullable(),
-  distance: Yup.number().required(),
-  duration: Yup.number().required(),
-  durationWithLoadTime: Yup.number().required(),
+  avgLoadTime: Yup.number().min(0),
+  estimatedStartDate: Yup.date().nullable(),
+  estimatedEndDate: Yup.date().nullable(),
+  distance: Yup.number().moreThan(0).nullable().required(),
+  duration: Yup.number().moreThan(0).nullable().required(),
+  durationWithLoadTime: Yup.number().moreThan(0).nullable().required(),
   geometry: Yup.object().nullable().required(),
   started: Yup.date().nullable(),
   completed: Yup.date().nullable(),

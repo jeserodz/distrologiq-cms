@@ -21,12 +21,6 @@ import { exists, mapValues } from '../runtime';
 export interface UpdateDestinationDTO {
     /**
      * 
-     * @type {number}
-     * @memberof UpdateDestinationDTO
-     */
-    id: number;
-    /**
-     * 
      * @type {string}
      * @memberof UpdateDestinationDTO
      */
@@ -67,6 +61,12 @@ export interface UpdateDestinationDTO {
      * @memberof UpdateDestinationDTO
      */
     latitude?: number;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof UpdateDestinationDTO
+     */
+    isOwnCompany?: boolean;
 }
 
 export function UpdateDestinationDTOFromJSON(json: any): UpdateDestinationDTO {
@@ -79,7 +79,6 @@ export function UpdateDestinationDTOFromJSONTyped(json: any, ignoreDiscriminator
     }
     return {
         
-        'id': json['id'],
         'name': !exists(json, 'name') ? undefined : json['name'],
         'email': !exists(json, 'email') ? undefined : json['email'],
         'phone': !exists(json, 'phone') ? undefined : json['phone'],
@@ -87,6 +86,7 @@ export function UpdateDestinationDTOFromJSONTyped(json: any, ignoreDiscriminator
         'references': !exists(json, 'references') ? undefined : json['references'],
         'longitude': !exists(json, 'longitude') ? undefined : json['longitude'],
         'latitude': !exists(json, 'latitude') ? undefined : json['latitude'],
+        'isOwnCompany': !exists(json, 'isOwnCompany') ? undefined : json['isOwnCompany'],
     };
 }
 
@@ -99,7 +99,6 @@ export function UpdateDestinationDTOToJSON(value?: UpdateDestinationDTO | null):
     }
     return {
         
-        'id': value.id,
         'name': value.name,
         'email': value.email,
         'phone': value.phone,
@@ -107,6 +106,7 @@ export function UpdateDestinationDTOToJSON(value?: UpdateDestinationDTO | null):
         'references': value.references,
         'longitude': value.longitude,
         'latitude': value.latitude,
+        'isOwnCompany': value.isOwnCompany,
     };
 }
 

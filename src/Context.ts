@@ -1,5 +1,6 @@
-import { createContext } from "react";
-import { Configuration, AuthApi } from "./api";
+import { createContext } from 'react';
+import axios from 'axios';
+import { Configuration, AuthApi } from './api';
 
 // @ts-ignore
 const env = window.env as any;
@@ -26,6 +27,15 @@ export const Context = createContext({
     }
   },
 
+  getApi() {
+    return axios.create({
+      baseURL: String(env.API_URL),
+      headers: {
+        Authorization: `Bearer ${this.accessToken}`,
+      },
+    });
+  },
+
   getApiConfig(): Configuration {
     return new Configuration({
       basePath: String(env.API_URL),
@@ -34,11 +44,11 @@ export const Context = createContext({
   },
 
   save() {
-    localStorage.setItem("AppContext", JSON.stringify(this));
+    localStorage.setItem('AppContext', JSON.stringify(this));
   },
 
   load() {
-    const ctx = JSON.parse(localStorage.getItem("AppContext") || "{}");
+    const ctx = JSON.parse(localStorage.getItem('AppContext') || '{}');
     if (ctx.loggedIn) this.setLoggedIn(ctx.loggedIn);
     if (ctx.accessToken) this.setAccessToken(ctx.accessToken);
   },

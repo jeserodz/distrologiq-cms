@@ -1,18 +1,11 @@
 import React from 'react';
+import { RouteComponentProps, useNavigate } from '@reach/router';
 import { AppBar, Toolbar, Typography } from '@material-ui/core';
-import { Switch, Route, useHistory, Redirect } from 'react-router-dom';
 import { makeStyles, createStyles, Theme } from '@material-ui/core';
 import { DashboardLinks } from './DaskboardLinks';
 import { DashboardSidebar } from './DashboardSidebar';
-import { UsersScreenConnector } from '../../screens/UsersScreen';
-import { UserScreenConnector } from '../../screens/UserScreen';
-import { UserAnalyticsScreen } from '../../screens/UserAnalyticsScreen/UserAnalyticsScreen';
-import { DestinationsScreenConnector } from '../../screens/DestinationsScreen';
-import { DestinationScreenConnector } from '../../screens/DestinationScreen';
-import { RouteScreenConnector } from '../../screens/RouteScreen';
-import { RoutesScreenConnector } from '../../screens/RoutesScreen';
-import { SettingsScreenConnector } from '../../screens/SettingsScreen';
 import './Dashboard.css';
+import { AuthGuard } from '../AuthGuard';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -30,68 +23,41 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-export function Dashboard() {
+interface Props extends RouteComponentProps {
+  children: React.ReactNode;
+}
+
+export function Dashboard(props: Props) {
   const classes = useStyles();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   function handleSidebarPress(link: DashboardLinks) {
     switch (link) {
       case DashboardLinks.Logout:
-        // TODO: Implement logout with GraphQL
-        return null;
+        return navigate('/login', { replace: true });
       default:
-        return history.push(link);
+        return navigate(link);
     }
   }
 
   return (
-    <div className="Dashboard">
-      <AppBar className={classes.appBar} position="fixed">
-        <Toolbar>
-          <Typography variant="h6" noWrap>
-            Distrologiq
-          </Typography>
-        </Toolbar>
-      </AppBar>
+    <AuthGuard loggedIn>
+      <div className="Dashboard">
+        <AppBar className={classes.appBar} position="fixed">
+          <Toolbar>
+            <Typography variant="h6" noWrap>
+              Distrologiq
+            </Typography>
+          </Toolbar>
+        </AppBar>
 
-      <DashboardSidebar onPress={handleSidebarPress} />
+        <DashboardSidebar onPress={handleSidebarPress} />
 
-      <div className="Dasboard_Content">
-        <div className={classes.toolbar} />
-        <Switch>
-          <Redirect exact from="/dashboard" to="/dashboard/settings" />
-          <Route exact path="/dashboard/users">
-            <UsersScreenConnector />
-          </Route>
-          <Route exact path="/dashboard/users/:id">
-            <UserScreenConnector />
-          </Route>
-          <Route exact path="/dashboard/users/:id/analytics">
-            <UserAnalyticsScreen />
-          </Route>
-          <Route exact path="/dashboard/destinations">
-            <DestinationsScreenConnector />
-          </Route>
-          <Route exact path="/dashboard/destinations/new">
-            <DestinationScreenConnector />
-          </Route>
-          <Route exact path="/dashboard/destinations/:id">
-            <DestinationScreenConnector />
-          </Route>
-          <Route exact path="/dashboard/routes">
-            <RoutesScreenConnector />
-          </Route>
-          <Route exact path="/dashboard/routes/new">
-            <RouteScreenConnector />
-          </Route>
-          <Route exact path="/dashboard/routes/:id">
-            <RouteScreenConnector />
-          </Route>
-          <Route exact path="/dashboard/settings">
-            <SettingsScreenConnector />
-          </Route>
-        </Switch>
+        <div className="Dashboard_Content">
+          <div className={classes.toolbar} />
+          <div className="Dashboard_Outlet">{props.children}</div>
+        </div>
       </div>
-    </div>
+    </AuthGuard>
   );
 }

@@ -30,25 +30,25 @@ export interface CreateDestinationDTO {
      * @type {string}
      * @memberof CreateDestinationDTO
      */
-    email: string;
+    email?: string;
     /**
      * 
      * @type {string}
      * @memberof CreateDestinationDTO
      */
-    phone: string;
+    phone?: string;
     /**
      * 
      * @type {string}
      * @memberof CreateDestinationDTO
      */
-    code: string;
+    code?: string;
     /**
      * 
      * @type {string}
      * @memberof CreateDestinationDTO
      */
-    references: string;
+    references?: string;
     /**
      * 
      * @type {number}
@@ -61,6 +61,12 @@ export interface CreateDestinationDTO {
      * @memberof CreateDestinationDTO
      */
     latitude: number;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof CreateDestinationDTO
+     */
+    isOwnCompany?: boolean;
 }
 
 export function CreateDestinationDTOFromJSON(json: any): CreateDestinationDTO {
@@ -74,12 +80,13 @@ export function CreateDestinationDTOFromJSONTyped(json: any, ignoreDiscriminator
     return {
         
         'name': json['name'],
-        'email': json['email'],
-        'phone': json['phone'],
-        'code': json['code'],
-        'references': json['references'],
+        'email': !exists(json, 'email') ? undefined : json['email'],
+        'phone': !exists(json, 'phone') ? undefined : json['phone'],
+        'code': !exists(json, 'code') ? undefined : json['code'],
+        'references': !exists(json, 'references') ? undefined : json['references'],
         'longitude': json['longitude'],
         'latitude': json['latitude'],
+        'isOwnCompany': !exists(json, 'isOwnCompany') ? undefined : json['isOwnCompany'],
     };
 }
 
@@ -99,6 +106,7 @@ export function CreateDestinationDTOToJSON(value?: CreateDestinationDTO | null):
         'references': value.references,
         'longitude': value.longitude,
         'latitude': value.latitude,
+        'isOwnCompany': value.isOwnCompany,
     };
 }
 

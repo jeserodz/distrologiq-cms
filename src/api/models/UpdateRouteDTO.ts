@@ -66,6 +66,12 @@ export interface UpdateRouteDTO {
     durationWithLoadTime: number;
     /**
      * 
+     * @type {Date}
+     * @memberof UpdateRouteDTO
+     */
+    estimatedStartDate: Date;
+    /**
+     * 
      * @type {RouteGeometry}
      * @memberof UpdateRouteDTO
      */
@@ -100,6 +106,18 @@ export interface UpdateRouteDTO {
      * @memberof UpdateRouteDTO
      */
     driver: User;
+    /**
+     * 
+     * @type {Date}
+     * @memberof UpdateRouteDTO
+     */
+    estimatedEndDate: Date;
+    /**
+     * 
+     * @type {number}
+     * @memberof UpdateRouteDTO
+     */
+    avgLoadTime: number;
 }
 
 export function UpdateRouteDTOFromJSON(json: any): UpdateRouteDTO {
@@ -117,12 +135,15 @@ export function UpdateRouteDTOFromJSONTyped(json: any, ignoreDiscriminator: bool
         'distance': json['distance'],
         'duration': json['duration'],
         'durationWithLoadTime': json['durationWithLoadTime'],
+        'estimatedStartDate': (new Date(json['estimatedStartDate'])),
         'geometry': RouteGeometryFromJSON(json['geometry']),
         'started': (new Date(json['started'])),
         'completed': (new Date(json['completed'])),
         'completedDuration': json['completedDuration'],
         'stops': ((json['stops'] as Array<any>).map(RouteStopFromJSON)),
         'driver': UserFromJSON(json['driver']),
+        'estimatedEndDate': (new Date(json['estimatedEndDate'])),
+        'avgLoadTime': json['avgLoadTime'],
     };
 }
 
@@ -140,12 +161,15 @@ export function UpdateRouteDTOToJSON(value?: UpdateRouteDTO | null): any {
         'distance': value.distance,
         'duration': value.duration,
         'durationWithLoadTime': value.durationWithLoadTime,
+        'estimatedStartDate': (value.estimatedStartDate.toISOString()),
         'geometry': RouteGeometryToJSON(value.geometry),
         'started': (value.started.toISOString()),
         'completed': (value.completed.toISOString()),
         'completedDuration': value.completedDuration,
         'stops': ((value.stops as Array<any>).map(RouteStopToJSON)),
         'driver': UserToJSON(value.driver),
+        'estimatedEndDate': (value.estimatedEndDate.toISOString()),
+        'avgLoadTime': value.avgLoadTime,
     };
 }
 

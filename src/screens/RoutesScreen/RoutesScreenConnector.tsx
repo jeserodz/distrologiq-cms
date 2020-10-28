@@ -1,37 +1,43 @@
-import React, { useContext } from "react";
-import { useHistory } from "react-router";
-import { useQuery } from "react-query";
-import { Toaster } from "../../utils/toaster";
-import { RoutesScreen } from "./RoutesScreen";
-import { RoutesApi, Route } from "../../api";
-import { Context } from "../../Context";
+import React, { useContext } from 'react';
+import { RouteComponentProps, useNavigate } from '@reach/router';
+import { useQuery } from 'react-query';
+import { Toaster } from '../../utils/toaster';
+import { RoutesScreen } from './RoutesScreen';
+import { Route } from '../../api';
+import { Context } from '../../Context';
+import { AxiosError } from 'axios';
 
-export function RoutesScreenConnector() {
-  const history = useHistory();
+export function RoutesScreenConnector(props: RouteComponentProps) {
+  const navigate = useNavigate();
   const context = useContext(Context);
-  const routesApi = new RoutesApi(context.getApiConfig());
+  const api = context.getApi();
 
-  const getRoutesResponse = useQuery(["getRoutes"], (key) =>
-    routesApi.getRoutes()
+  const getRoutes = useQuery(
+    ['getRoutes'],
+    async () => {
+      const response = await api.get('/routes');
+      return response.data as Route[];
+    },
+    {
+      onError: (error: AxiosError) => {
+        Toaster.show(`error`, error.response?.data.message || error.message);
+      },
+    }
   );
 
   function handleRoutePress(route: Route) {
-    history.push(`/dashboard/routes/${route.id}`);
+    navigate(`/dashboard/routes/${route.id}`);
   }
 
   function handleCreatePress() {
-    history.push("/dashboard/routes/new");
+    navigate('/dashboard/routes/new');
   }
 
-  if (getRoutesResponse.error) {
-    Toaster.show(`error`, getRoutesResponse.error.message);
-  }
-
-  return getRoutesResponse.data ? (
+  return (
     <RoutesScreen
-      routes={getRoutesResponse.data}
+      routes={getRoutes.data || []}
       onRoutePress={handleRoutePress}
       onCreatePress={handleCreatePress}
     />
-  ) : null;
+  );
 }

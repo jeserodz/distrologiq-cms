@@ -18,6 +18,7 @@ export * from './SignInResponseDTO';
 export * from './StartRouteStopDTO';
 export * from './UpdateDestinationDTO';
 export * from './UpdateRouteDTO';
+export * from './UpdateUserDTO';
 export * from './User';
 export * from './UserAnalyticsDTO';
 export * from './UserAnalyticsDTOUser';

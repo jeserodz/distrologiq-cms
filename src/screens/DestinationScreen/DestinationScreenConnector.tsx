@@ -1,7 +1,6 @@
 import React, { useContext } from 'react';
-import { useParams, useHistory } from 'react-router-dom';
+import { RouteComponentProps, useParams, useNavigate } from '@reach/router';
 import { DestinationScreen } from './DestinationScreen';
-import { DestinationForm } from './DestinationScreen.form';
 import { useQuery, useMutation } from 'react-query';
 import { Toaster } from '../../utils/toaster';
 import { Context } from '../../Context';
@@ -9,48 +8,72 @@ import {
   DestinationsApi,
   CreateDestinationDTO,
   UpdateDestinationDTO,
+  Destination,
 } from '../../api';
+import { AxiosError } from 'axios';
 
-export function DestinationScreenConnector() {
+export function DestinationScreenConnector(props: RouteComponentProps) {
   const { id } = useParams();
-  const history = useHistory();
+  const navigate = useNavigate();
   const context = useContext(Context);
+  const api = context.getApi();
 
-  const destinationsApi = new DestinationsApi(context.getApiConfig());
-
-  const getDestinationResponse = useQuery('getDestination', () =>
-    destinationsApi.getDestination(id)
+  const getDestination = useQuery(
+    ['getDestination', id],
+    async () => {
+      const response = await api.get(`/destinations/${id}`);
+      return response.data as Destination;
+    },
+    {
+      enabled: id !== 'new',
+      onError: (error: AxiosError) => {
+        Toaster.show('error', error.response?.data.message || error.message);
+      },
+    }
   );
 
-  const [createDestination] = useMutation((data: CreateDestinationDTO) =>
-    destinationsApi.createDestination(data)
+  const [createDestination] = useMutation(
+    async (data: CreateDestinationDTO) => {
+      const response = await api.post('/destinations', data);
+      return response.data as Destination;
+    },
+    {
+      onSuccess: (destination) => {
+        Toaster.show('success', 'Destino creado');
+        navigate(`/dashboard/destinations/${destination.id}`, {
+          replace: true,
+        });
+      },
+      onError: (error: AxiosError) => {
+        Toaster.show('error', error.response?.data.message || error.message);
+      },
+    }
   );
 
-  const [updateDestination] = useMutation((data: UpdateDestinationDTO) =>
-    destinationsApi.updateDestination(id, data)
+  const [updateDestination] = useMutation(
+    async (data: UpdateDestinationDTO) => {
+      const response = await api.patch(`/destinations/${id}`, data);
+      return response.data as Destination;
+    },
+    {
+      onSuccess: () => {
+        Toaster.show('success', 'Destino actualizado');
+        getDestination.refetch();
+      },
+      onError: (error: AxiosError) => {
+        Toaster.show('error', error.response?.data.message || error.message);
+      },
+    }
   );
 
-  async function handleCreate(values: DestinationForm) {
-    const destination = await createDestination(values);
-    Toaster.show('success', 'Destino creado.');
-    history.replace(`/dashboard/destinations/${destination.id}`);
-  }
-
-  async function handleUpdate(data: UpdateDestinationDTO) {
-    if (!id) return;
-    const destination = await updateDestination(data);
-    Toaster.show('success', 'Destino actualizado.');
-    history.replace(`/dashboard/destinations/${destination.id}`);
-  }
-
-  return getDestinationResponse.isLoading ? null : (
+  return id === 'new' || getDestination.data ? (
     <DestinationScreen
-      destination={getDestinationResponse.data}
+      destination={getDestination.data}
       onSubmit={(data) =>
-        id
-          ? handleUpdate(data as UpdateDestinationDTO)
-          : handleCreate(data as CreateDestinationDTO)
+        id === 'new'
+          ? createDestination(data as CreateDestinationDTO)
+          : updateDestination(data as UpdateDestinationDTO)
       }
     />
-  );
+  ) : null;
 }

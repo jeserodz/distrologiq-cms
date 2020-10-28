@@ -1,16 +1,17 @@
-import React, { useContext } from "react";
-import { useQuery, useMutation } from "react-query";
-import { Toaster } from "../../utils/toaster";
-import { SettingsScreen } from "./SettingsScreen";
-import { SettingsForm } from "./SettingsForm";
-import { SettingsApi, SetSettingsDTO } from "../../api";
-import { Context } from "../../Context";
+import React, { useContext } from 'react';
+import { RouteComponentProps } from '@reach/router';
+import { useQuery, useMutation } from 'react-query';
+import { Toaster } from '../../utils/toaster';
+import { SettingsScreen } from './SettingsScreen';
+import { SettingsForm } from './SettingsForm';
+import { SettingsApi, SetSettingsDTO } from '../../api';
+import { Context } from '../../Context';
 
-export function SettingsScreenConnector() {
+export function SettingsScreenConnector(props: RouteComponentProps) {
   const context = useContext(Context);
   const settingsApi = new SettingsApi(context.getApiConfig());
 
-  const getSettingsResponse = useQuery(["getSettings"], (key) =>
+  const getSettingsResponse = useQuery(['getSettings'], (key) =>
     settingsApi.getSettings()
   );
 
@@ -18,7 +19,7 @@ export function SettingsScreenConnector() {
     (data: SetSettingsDTO) => settingsApi.updateSettings(data),
     {
       onSuccess: () => {
-        Toaster.show("success", "Cambios guardados.");
+        Toaster.show('success', 'Cambios guardados.');
         getSettingsResponse.refetch();
       },
     }

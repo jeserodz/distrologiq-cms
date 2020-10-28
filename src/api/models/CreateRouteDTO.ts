@@ -60,6 +60,12 @@ export interface CreateRouteDTO {
     durationWithLoadTime: number;
     /**
      * 
+     * @type {Date}
+     * @memberof CreateRouteDTO
+     */
+    estimatedStartDate: Date;
+    /**
+     * 
      * @type {RouteGeometry}
      * @memberof CreateRouteDTO
      */
@@ -76,6 +82,18 @@ export interface CreateRouteDTO {
      * @memberof CreateRouteDTO
      */
     driver?: User;
+    /**
+     * 
+     * @type {Date}
+     * @memberof CreateRouteDTO
+     */
+    estimatedEndDate: Date;
+    /**
+     * 
+     * @type {number}
+     * @memberof CreateRouteDTO
+     */
+    avgLoadTime: number;
 }
 
 export function CreateRouteDTOFromJSON(json: any): CreateRouteDTO {
@@ -92,9 +110,12 @@ export function CreateRouteDTOFromJSONTyped(json: any, ignoreDiscriminator: bool
         'distance': json['distance'],
         'duration': json['duration'],
         'durationWithLoadTime': json['durationWithLoadTime'],
+        'estimatedStartDate': (new Date(json['estimatedStartDate'])),
         'geometry': RouteGeometryFromJSON(json['geometry']),
         'stops': ((json['stops'] as Array<any>).map(RouteStopFromJSON)),
         'driver': !exists(json, 'driver') ? undefined : UserFromJSON(json['driver']),
+        'estimatedEndDate': (new Date(json['estimatedEndDate'])),
+        'avgLoadTime': json['avgLoadTime'],
     };
 }
 
@@ -111,9 +132,12 @@ export function CreateRouteDTOToJSON(value?: CreateRouteDTO | null): any {
         'distance': value.distance,
         'duration': value.duration,
         'durationWithLoadTime': value.durationWithLoadTime,
+        'estimatedStartDate': (value.estimatedStartDate.toISOString()),
         'geometry': RouteGeometryToJSON(value.geometry),
         'stops': ((value.stops as Array<any>).map(RouteStopToJSON)),
         'driver': UserToJSON(value.driver),
+        'estimatedEndDate': (value.estimatedEndDate.toISOString()),
+        'avgLoadTime': value.avgLoadTime,
     };
 }
 

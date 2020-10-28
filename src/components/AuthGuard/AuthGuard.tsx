@@ -1,22 +1,22 @@
-// import { useContext } from 'react';
-import { useHistory } from 'react-router-dom';
-import { useQuery } from 'react-query';
-// import { config } from '../../utils/config';
-// import { AuthContext } from '../../contexts/AuthContext';
-import { api } from '../../utils/api';
+import React, { useContext } from 'react';
+import { useNavigate } from '@reach/router';
+import { Context } from '../../Context';
 
-export interface AuthGuardProps {
-  children: any;
+interface Props {
+  children: React.ReactNode;
+  loggedIn?: boolean;
+  roles?: [];
+  abilities?: [];
+  redirectTo?: string;
 }
 
-export function AuthGuard(props: AuthGuardProps) {
-  const history = useHistory();
+export function AuthGuard(props: Props) {
+  const navigate = useNavigate();
+  const context = useContext(Context);
 
-  const { error } = useQuery('verifyToken', () => api.get('/auth/verifyToken'));
-
-  if (error) {
-    history.replace('/login');
+  if (props.loggedIn && !context.loggedIn) {
+    navigate(props.redirectTo || '/login', { replace: true });
   }
 
-  return props.children;
+  return <>{props.children}</>;
 }

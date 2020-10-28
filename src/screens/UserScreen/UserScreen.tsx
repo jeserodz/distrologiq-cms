@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   Typography,
   Paper,
@@ -11,12 +11,12 @@ import {
   Checkbox,
   FormControlLabel,
   TableHead,
-} from "@material-ui/core";
-import { Formik } from "formik";
-import { User } from "../../api";
-import { formSchema, initialValues } from "./UserScreen.form";
-import { SimpleDialog } from "../../components/SimpleDialog";
-import colors from "../../utils/colors";
+} from '@material-ui/core';
+import { Formik } from 'formik';
+import { User } from '../../api';
+import { formSchema, initialValues } from './UserScreen.form';
+import { SimpleDialog } from '../../components/SimpleDialog';
+import colors from '../../utils/colors';
 
 export interface UserScreenProps {
   user: User | undefined;
@@ -26,14 +26,6 @@ export interface UserScreenProps {
 
 export function UserScreen(props: UserScreenProps) {
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
-
-  function handleClickOpen() {
-    return setPasswordModalOpen(true);
-  }
-
-  function handleClose() {
-    return setPasswordModalOpen(false);
-  }
 
   function handleSubmit(values: any) {
     console.log(values);
@@ -62,7 +54,7 @@ export function UserScreen(props: UserScreenProps) {
                         <TableCell
                           style={{
                             backgroundColor: colors.primaryDark,
-                            color: "white",
+                            color: 'white',
                           }}
                           colSpan={2}
                         >
@@ -74,37 +66,26 @@ export function UserScreen(props: UserScreenProps) {
                       <TableRow>
                         <TableCell>
                           <TextField
-                            name="id"
-                            label="ID"
-                            value={values.id}
-                            onChange={handleChange}
-                            error={!!errors.id}
-                            helperText={errors.id}
-                            disabled={true}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <TextField
                             name="username"
-                            label="Usuario"
+                            label="Nombre de Usuario"
                             value={values.username}
                             onChange={handleChange}
                             error={!!errors.username}
                             helperText={errors.username}
                           />
                         </TableCell>
-                      </TableRow>
-                      <TableRow>
                         <TableCell>
                           <TextField
                             name="displayName"
-                            label="Nombre"
+                            label="Nombre Personal"
                             value={values.displayName}
                             onChange={handleChange}
                             error={!!errors.displayName}
                             helperText={errors.displayName}
                           />
                         </TableCell>
+                      </TableRow>
+                      <TableRow>
                         <TableCell>
                           <TextField
                             label="Email"
@@ -115,6 +96,31 @@ export function UserScreen(props: UserScreenProps) {
                             helperText={errors.email}
                           />
                         </TableCell>
+                        {props.user ? (
+                          <TableCell>
+                            <TextField
+                              name="id"
+                              label="ID"
+                              value={values.id}
+                              onChange={handleChange}
+                              error={!!errors.id}
+                              helperText={errors.id}
+                              disabled={true}
+                            />
+                          </TableCell>
+                        ) : (
+                          <TableCell>
+                            <TextField
+                              name="password"
+                              label="Contraseña"
+                              value={values.password}
+                              onChange={handleChange}
+                              error={!!errors.password}
+                              helperText={errors.password}
+                              type="password"
+                            />
+                          </TableCell>
+                        )}
                       </TableRow>
                     </TableBody>
                   </Table>
@@ -126,7 +132,7 @@ export function UserScreen(props: UserScreenProps) {
                         <TableCell
                           style={{
                             backgroundColor: colors.primaryDark,
-                            color: "white",
+                            color: 'white',
                           }}
                           colSpan={2}
                         >
@@ -168,26 +174,37 @@ export function UserScreen(props: UserScreenProps) {
                 </TableRow>
                 <TableRow>
                   <TableCell>
-                    <Button
-                      variant="contained"
-                      color="secondary"
-                      style={{ marginRight: 20 }}
-                      onClick={() => props.onAnalyticsClick(props.user!)}
-                    >
-                      Ver Métricas
-                    </Button>
-                    <Button
-                      variant="contained"
-                      color="secondary"
-                      style={{ marginRight: 20 }}
-                      onClick={handleClickOpen}
-                    >
-                      Cambiar Contraseña
-                    </Button>
-                    <SimpleDialog
-                      open={passwordModalOpen}
-                      onClose={handleClose}
-                    />
+                    {props.user && (
+                      <Button
+                        variant="contained"
+                        color="secondary"
+                        style={{ marginRight: 20 }}
+                        onClick={() => props.onAnalyticsClick(props.user!)}
+                      >
+                        Ver Métricas
+                      </Button>
+                    )}
+                    {props.user && (
+                      <>
+                        <Button
+                          variant="contained"
+                          color="secondary"
+                          style={{ marginRight: 20 }}
+                          onClick={() => setPasswordModalOpen(true)}
+                        >
+                          Cambiar Contraseña
+                        </Button>
+
+                        <SimpleDialog
+                          open={passwordModalOpen}
+                          onClose={() => setPasswordModalOpen(false)}
+                          onSubmit={(values) => {
+                            props.onSubmit({ ...props.user, ...values });
+                            setPasswordModalOpen(false);
+                          }}
+                        />
+                      </>
+                    )}
                     <Button type="submit" variant="contained" color="primary">
                       Guardar
                     </Button>

@@ -27,6 +27,7 @@ models/SignInResponseDTO.ts
 models/StartRouteStopDTO.ts
 models/UpdateDestinationDTO.ts
 models/UpdateRouteDTO.ts
+models/UpdateUserDTO.ts
 models/User.ts
 models/UserAnalyticsDTO.ts
 models/UserAnalyticsDTOUser.ts

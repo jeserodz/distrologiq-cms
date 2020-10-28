@@ -1,50 +1,50 @@
-import React, { useContext } from "react";
-import { useHistory, useParams } from "react-router";
-import { useQuery, useMutation } from "react-query";
-import { Toaster } from "../../utils/toaster";
-import { UserScreen } from "./UserScreen";
-import { UserForm } from "./UserScreen.form";
-import { UsersApi, CreateUserDTO, User } from "../../api";
-import { Context } from "../../Context";
+import React, { useContext } from 'react';
+import { RouteComponentProps, useNavigate, useParams } from '@reach/router';
+import { useQuery, useMutation } from 'react-query';
+import { Toaster } from '../../utils/toaster';
+import { UserScreen } from './UserScreen';
+import { UsersApi, CreateUserDTO, User, UpdateUserDTO } from '../../api';
+import { Context } from '../../Context';
 
-export function UserScreenConnector() {
-  const history = useHistory();
+export function UserScreenConnector(props: RouteComponentProps) {
+  const { id } = useParams();
+  const navigate = useNavigate();
   const context = useContext(Context);
   const usersApi = new UsersApi(context.getApiConfig());
-  const { id } = useParams();
 
-  const getUserResponse = useQuery(["getUser", id], (key, id) =>
-    usersApi.getUser(id)
-  );
+  const getUser = useQuery([`getUser ${id}`], () => usersApi.getUser(id), {
+    enabled: id !== 'new',
+  });
 
-  const [createUser] = useMutation((data: CreateUserDTO) =>
-    usersApi.createUser(data)
-  );
-
-  const [updateUser] = useMutation((data: any) => usersApi.updateUser(data));
-
-  async function handleCreate(values: UserForm) {
-    const user = await createUser(values);
-    Toaster.show("success", "Usuario creado.");
-    history.replace(`/dashboard/users/${user.id}`);
+  async function handleCreate(values: CreateUserDTO) {
+    try {
+      const user = await usersApi.createUser(values);
+      Toaster.show('success', 'Usuario creado.');
+      navigate(`/dashboard/users/${user.id}`, { replace: true });
+    } catch (error) {
+      Toaster.show('error', (await error.json()).message);
+    }
   }
 
-  async function handleUpdate(data: any) {
-    if (!id) return;
-    const user = (await updateUser(data)) as User;
-    Toaster.show("success", "Usuario actualizado.");
-    history.replace(`/dashboard/users/${user.id}`);
+  async function handleUpdate(data: UpdateUserDTO) {
+    try {
+      if (!getUser.data) return;
+      await usersApi.updateUser(getUser.data.id, data);
+      Toaster.show('success', 'Usuario actualizado.');
+      getUser.refetch();
+    } catch (error) {
+      Toaster.show('error', (await error.json()).message);
+    }
   }
 
-  return getUserResponse.data ? (
+  return id === 'new' || getUser.data ? (
     <UserScreen
-      user={getUserResponse.data}
+      user={getUser.data}
       onSubmit={(data) =>
-        id ? handleUpdate(data as any) : handleCreate(data as any)
+        getUser.data ? handleUpdate(data) : handleCreate(data)
       }
       onAnalyticsClick={(user) => {
-        console.log(user);
-        history.push(`/dashboard/users/${user.id}/analytics`);
+        navigate(`/dashboard/users/${user.id}/analytics`);
       }}
     />
   ) : null;

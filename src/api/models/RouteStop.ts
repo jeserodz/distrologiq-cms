@@ -72,18 +72,6 @@ export interface RouteStop {
      * @memberof RouteStop
      */
     completed: Date;
-    /**
-     * 
-     * @type {Date}
-     * @memberof RouteStop
-     */
-    createdAt: Date;
-    /**
-     * 
-     * @type {Date}
-     * @memberof RouteStop
-     */
-    updatedAt: Date;
 }
 
 export function RouteStopFromJSON(json: any): RouteStop {
@@ -103,8 +91,6 @@ export function RouteStopFromJSONTyped(json: any, ignoreDiscriminator: boolean):
         'waypointIndex': json['waypointIndex'],
         'started': (new Date(json['started'])),
         'completed': (new Date(json['completed'])),
-        'createdAt': (new Date(json['createdAt'])),
-        'updatedAt': (new Date(json['updatedAt'])),
     };
 }
 
@@ -124,8 +110,6 @@ export function RouteStopToJSON(value?: RouteStop | null): any {
         'waypointIndex': value.waypointIndex,
         'started': (value.started.toISOString()),
         'completed': (value.completed.toISOString()),
-        'createdAt': (value.createdAt.toISOString()),
-        'updatedAt': (value.updatedAt.toISOString()),
     };
 }
 

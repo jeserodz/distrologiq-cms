@@ -1,24 +1,35 @@
 import React from 'react';
-import { Typography, Paper, Table, TableRow, Button } from '@material-ui/core';
+import {
+  Typography,
+  Paper,
+  Table,
+  TableRow,
+  Button,
+  Box,
+  Grid,
+} from '@material-ui/core';
 import { TableCell, TableBody, TextField } from '@material-ui/core';
-import { Formik } from 'formik';
+import { Formik, useFormik } from 'formik';
 import { Map } from '../../components/Map';
 import { PlacesSearchConnector } from '../../components/PlacesSearch';
 import { Place } from '../../types';
-import { Destination } from '../../api';
-import {
-  DestinationForm,
-  formSchema,
-  initialValues,
-} from './DestinationScreen.form';
+import { Destination, CreateDestinationDTO } from '../../api';
+import { formSchema, initialValues } from './DestinationScreen.form';
 import './DestinationScreen.css';
 
 export interface DestinationScreenProps {
   destination: Destination | undefined;
-  onSubmit: (values: DestinationForm) => void;
+  onSubmit: (values: CreateDestinationDTO) => void;
 }
 
 export function DestinationScreen(props: DestinationScreenProps) {
+  const formik = useFormik({
+    validationSchema: formSchema,
+    initialValues: props.destination || initialValues,
+    enableReinitialize: true,
+    onSubmit: handleSubmit,
+  });
+
   const [focusedPlace, setFocusedPlace] = React.useState<Place | null>(null);
 
   function handleSearchPlaceHover(place: Place) {
@@ -27,144 +38,152 @@ export function DestinationScreen(props: DestinationScreenProps) {
 
   function handleSearchPlaceClick(place: Place, setFieldValue: any) {
     setFocusedPlace(null);
-    setFieldValue('latitude', place.latitude);
-    setFieldValue('longitude', place.longitude);
+    formik.setFieldValue('latitude', place.latitude);
+    formik.setFieldValue('longitude', place.longitude);
   }
 
   function handleMapDblClick(lat: number, lng: number, setFieldValue: any) {
-    setFieldValue('latitude', lat);
-    setFieldValue('longitude', lng);
+    formik.setFieldValue('latitude', lat);
+    formik.setFieldValue('longitude', lng);
   }
 
-  function handleSubmit(values: DestinationForm) {
+  function handleSubmit(values: CreateDestinationDTO) {
     console.log(values);
     props.onSubmit(values);
   }
 
   return (
-    <Formik
-      validationSchema={formSchema}
-      initialValues={props.destination || initialValues}
-      enableReinitialize
-      onSubmit={handleSubmit}
-    >
-      {({ values, errors, handleSubmit, handleChange, setFieldValue }) => (
-        <form onSubmit={handleSubmit}>
-          <div className="DashboardScreen DestinationScreen">
-            <div className="DashboardScreen_Header">
-              <Typography variant="h5">Destino</Typography>
-            </div>
-            <Paper>
-              <Table>
-                <TableBody>
-                  <TableRow>
-                    <TableCell>
-                      <TextField
-                        name="name"
-                        label="Nombre"
-                        value={values.name}
-                        onChange={handleChange}
-                        error={!!errors.name}
-                        helperText={errors.name}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <TextField
-                        label="Email"
-                        name="email"
-                        value={values.email}
-                        onChange={handleChange}
-                        error={!!errors.email}
-                        helperText={errors.email}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <TextField
-                        label="Teléfono"
-                        name="phone"
-                        value={values.phone}
-                        onChange={handleChange}
-                        error={!!errors.phone}
-                        helperText={errors.phone}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <TextField
-                        label="Código"
-                        name="code"
-                        value={values.code}
-                        onChange={handleChange}
-                        error={!!errors.code}
-                        helperText={errors.code}
-                      />
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>
-                      <TextField
-                        label="Latitud"
-                        name="latitude"
-                        value={values.latitude}
-                        onChange={handleChange}
-                        error={!!errors.latitude}
-                        helperText={errors.latitude}
-                        placeholder="Seleccione un lugar en el mapa"
-                        disabled
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <TextField
-                        label="Longitud"
-                        name="longitude"
-                        value={values.longitude}
-                        onChange={handleChange}
-                        error={!!errors.longitude}
-                        helperText={errors.longitude}
-                        placeholder="Seleccione un lugar en el mapa"
-                        disabled
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <TextField
-                        label="Referencias"
-                        name="references"
-                        value={values.references}
-                        onChange={handleChange}
-                        error={!!errors.references}
-                        helperText={errors.references}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Button type="submit" variant="contained" color="primary">
-                        Guardar
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
+    <form onSubmit={formik.handleSubmit}>
+      <div className="DashboardScreen DestinationScreen">
+        <div className="DashboardScreen_Header">
+          <Typography variant="h5">Destino</Typography>
+        </div>
+        <Box maxWidth={1600}>
+          <Paper>
+            <Box margin={3}>
+              <Grid container spacing={3}>
+                <Grid item xs={12}>
+                  <Typography variant="h6">Información General</Typography>
+                  <Typography variant="subtitle1">
+                    Introduzca los detalles del destino.
+                  </Typography>
+                  <Typography variant="subtitle2">
+                    Esto puede representar a un cliente de la empresa, o
+                    cualquier entidad que será usada como parada en las rutas.
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    variant="outlined"
+                    name="name"
+                    label="Nombre"
+                    value={formik.values.name}
+                    onChange={formik.handleChange}
+                    error={!!formik.errors.name}
+                    helperText={formik.errors.name}
+                  />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    variant="outlined"
+                    label="Email"
+                    name="email"
+                    value={formik.values.email}
+                    onChange={formik.handleChange}
+                    error={!!formik.errors.email}
+                    helperText={formik.errors.email}
+                  />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    variant="outlined"
+                    label="Teléfono"
+                    name="phone"
+                    value={formik.values.phone}
+                    onChange={formik.handleChange}
+                    error={!!formik.errors.phone}
+                    helperText={formik.errors.phone}
+                  />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    variant="outlined"
+                    label="Código"
+                    name="code"
+                    value={formik.values.code}
+                    onChange={formik.handleChange}
+                    error={!!formik.errors.code}
+                    helperText={formik.errors.code}
+                  />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    multiline
+                    variant="outlined"
+                    label="Referencias"
+                    name="references"
+                    value={formik.values.references}
+                    onChange={formik.handleChange}
+                    error={!!formik.errors.references}
+                    helperText={formik.errors.references}
+                  />
+                </Grid>
+                <Grid item xs={6} md={3}>
+                  <TextField
+                    variant="outlined"
+                    label="Latitud"
+                    name="latitude"
+                    value={formik.values.latitude}
+                    onChange={formik.handleChange}
+                    error={!!formik.errors.latitude}
+                    helperText={formik.errors.latitude}
+                    placeholder="Seleccione un lugar en el mapa"
+                    disabled
+                  />
+                </Grid>
+                <Grid item xs={6} md={3}>
+                  <TextField
+                    variant="outlined"
+                    label="Longitud"
+                    name="longitude"
+                    value={formik.values.longitude}
+                    onChange={formik.handleChange}
+                    error={!!formik.errors.longitude}
+                    helperText={formik.errors.longitude}
+                    placeholder="Seleccione un lugar en el mapa"
+                    disabled
+                  />
+                </Grid>
 
-              <div className="DestinationScreen_Map">
-                <Map
-                  place={{
-                    latitude: values.latitude,
-                    longitude: values.longitude,
-                  }}
-                  focusedPlace={focusedPlace}
-                  onDblClick={(lat, lng) =>
-                    handleMapDblClick(lat, lng, setFieldValue)
-                  }
-                />
-                <PlacesSearchConnector
-                  onHover={handleSearchPlaceHover}
-                  onClick={(place) =>
-                    handleSearchPlaceClick(place, setFieldValue)
-                  }
-                />
-              </div>
-            </Paper>
-          </div>
-        </form>
-      )}
-    </Formik>
+                <Grid item xs={12} md={6}>
+                  <Button type="submit" variant="contained" color="primary">
+                    Guardar
+                  </Button>
+                </Grid>
+              </Grid>
+            </Box>
+
+            <div className="DestinationScreen_Map">
+              <Map
+                place={{
+                  latitude: formik.values.latitude,
+                  longitude: formik.values.longitude,
+                }}
+                focusedPlace={focusedPlace}
+                onDblClick={(lat, lng) =>
+                  handleMapDblClick(lat, lng, formik.setFieldValue)
+                }
+              />
+              <PlacesSearchConnector
+                onHover={handleSearchPlaceHover}
+                onClick={(place) =>
+                  handleSearchPlaceClick(place, formik.setFieldValue)
+                }
+              />
+            </div>
+          </Paper>
+        </Box>
+      </div>
+    </form>
   );
 }

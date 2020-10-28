@@ -1,14 +1,31 @@
-import React, { useEffect } from 'react';
-import { sortBy } from 'lodash';
-import { Typography, Paper, TextField, Button } from '@material-ui/core';
-import { Select, MenuItem, InputLabel, FormControl } from '@material-ui/core';
-import { Table, TableBody, TableRow, TableCell } from '@material-ui/core';
-import { Autocomplete } from '@material-ui/lab';
-import { displayDistance, displayDuration } from '../../utils/display-helpers';
-import { useFormik } from 'formik';
-import { RouteForm, formSchema, initialValues } from './RouteScreen.form';
-import { Map } from '../../components/Map';
 import './RouteScreen.css';
+import React, { useEffect, useState } from 'react';
+import { sortBy } from 'lodash';
+import {
+  Typography,
+  Paper,
+  TextField,
+  Button,
+  List,
+  ListItem,
+  ListItemIcon,
+  Checkbox,
+  ListItemText,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
+  Grid,
+  Box,
+  useTheme,
+} from '@material-ui/core';
+import DeleteIcon from '@material-ui/icons/Delete';
+import { KeyboardDateTimePicker } from '@material-ui/pickers';
+import { useFormik } from 'formik';
+import { FormikUtils } from '../../utils/formik';
+import { displayDistance, displayDuration } from '../../utils/display-helpers';
+import { RouteScreenForm, formSchema, initialValues } from './RouteScreen.form';
+import { Map } from '../../components/Map';
 import { RouteStopCard } from '../../components/RouteStopCard';
 import {
   Destination,
@@ -19,21 +36,29 @@ import {
   RouteGeometry,
   Settings,
   RouteStopTypeEnum,
+  CreateRouteDTO,
+  UpdateRouteDTO,
+  CalculateRouteDTO,
 } from '../../api';
+import { ConfirmationDialog } from '../../components/ConfirmationDialog';
 
 export interface RouteScreenProps {
   route: Route | undefined;
   destinations: Destination[] | undefined;
   drivers: User[] | undefined;
   settings: Settings | undefined;
-  onSave: (route: RouteForm) => void;
+  onSave: (route: Partial<CreateRouteDTO | UpdateRouteDTO>) => void;
+  onDelete: () => any;
   calculateFn: (
-    routeStops: RouteStop[]
+    data: CalculateRouteDTO
   ) => Promise<CalculateRouteResponse | undefined>;
 }
 
 export function RouteScreen(props: RouteScreenProps) {
-  const formik = useFormik<RouteForm>({
+  const [destinationsFilter, setDestinationsFilter] = useState('');
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+  const formik = useFormik<RouteScreenForm>({
     initialValues: props.route || initialValues,
     validationSchema: formSchema,
     onSubmit: (values) => props.onSave(values),
@@ -41,65 +66,25 @@ export function RouteScreen(props: RouteScreenProps) {
     isInitialValid: false,
   });
 
-  function handleDestinationsChange(_: any, destinations: Destination[]) {
-    clearCalculation();
+  const formikUtils = new FormikUtils({ formik, validateAfterSubmit: true });
 
-    const oldStops = [...formik.values.stops];
-
-    const newStops = destinations.map((destination) => {
-      const oldStop = oldStops.find((s) => s.destination.id === destination.id);
-      return {
-        destination,
-        type: oldStop ? oldStop.type : RouteStopTypeEnum.DELIVERY,
-        started: oldStop ? oldStop.started : null,
-        completed: oldStop ? oldStop.completed : null,
-      };
-    });
-
-    formik.setFieldValue('stops', newStops);
-  }
-
-  function handleRouteStopTypeChange(
-    routeStop: RouteStop,
-    type: RouteStopTypeEnum
-  ) {
-    const stops = [...formik.values.stops];
-
-    stops.forEach((stop) => {
-      if (stop === routeStop) routeStop.type = type;
-    });
-
-    formik.setFieldValue('stops', stops);
-  }
-
-  async function handleCalculateClick() {
-    const calculateRoute = await props.calculateFn(formik.values.stops);
-
-    if (!calculateRoute) return;
-
-    formik.setFieldValue('distance', calculateRoute.distance);
-    formik.setFieldValue('duration', calculateRoute.duration);
-    formik.setFieldValue(
-      'durationWithLoadTime',
-      calculateRoute.durationWithLoadTime
+  function filterDestinations(destination: Destination) {
+    const filterText = destinationsFilter.toLowerCase();
+    return (
+      destination.name.toLowerCase().includes(filterText) ||
+      destination.code?.toLowerCase().includes(filterText)
     );
-    formik.setFieldValue('geometry', calculateRoute.geometry);
-    formik.setFieldValue('stops', calculateRoute.optimizedRouteStops);
   }
 
   function clearCalculation() {
     formik.setFieldValue('distance', initialValues.distance);
     formik.setFieldValue('duration', initialValues.duration);
-    formik.setFieldValue(
-      'durationWithLoadTime',
-      initialValues.durationWithLoadTime
-    );
+    formik.setFieldValue('durationWithLoadTime', initialValues.durationWithLoadTime); // prettier-ignore
     formik.setFieldValue('geometry', initialValues.geometry);
   }
 
-  function handleDriverSelect(event: any) {
-    const driver = props.drivers!.find((d) => d.id === event.target.value);
-    formik.setFieldValue('driver', driver);
+  function clearEstimatedEndDate() {
+    formik.setFieldValue('estimatedEndDate', null);
   }
 
   function initializeFinalStop() {
@@ -114,6 +99,71 @@ export function RouteScreen(props: RouteScreenProps) {
     }
   }
 
+  function handleDestinationsChange(
+    destination: Destination,
+    selected: boolean
+  ) {
+    if (props.destinations) {
+      clearCalculation();
+
+      if (selected) {
+        const stop = {
+          destination,
+          type: RouteStopTypeEnum.DELIVERY,
+        } as RouteStop;
+
+        formik.setFieldValue('stops', formik.values.stops.concat([stop]));
+      } else {
+        formik.setFieldValue(
+          'stops',
+          formik.values.stops.filter(
+            (stop: RouteStop) => stop.destination?.id !== destination.id
+          )
+        );
+      }
+    }
+  }
+
+  function handleRouteStopTypeChange(
+    routeStop: Partial<RouteStop>,
+    type: RouteStopTypeEnum
+  ) {
+    const stops = [...formik.values.stops!];
+
+    stops.forEach((stop) => {
+      if (stop === routeStop) routeStop.type = type;
+    });
+
+    formik.setFieldValue('stops', stops);
+  }
+
+  async function handleCalculateClick() {
+    const calcutation = await props.calculateFn({
+      routeStops: formik.values.stops!,
+      avgLoadTime: formik.values.avgLoadTime,
+      estimatedStartDate: formik.values.estimatedStartDate!,
+    });
+
+    if (!calcutation) return;
+
+    formik.setFieldValue('distance', calcutation.distance);
+    formik.setFieldValue('duration', calcutation.duration);
+    formik.setFieldValue('durationWithLoadTime', calcutation.durationWithLoadTime); // prettier-ignore
+    formik.setFieldValue('estimatedStartDate', calcutation.estimatedStartDate); // prettier-ignore
+    formik.setFieldValue('estimatedEndDate', calcutation.estimatedEndDate); // prettier-ignore
+    formik.setFieldValue('geometry', calcutation.geometry);
+    formik.setFieldValue('stops', calcutation.optimizedRouteStops);
+  }
+
+  function handleDriverSelect(event: any) {
+    const driver = props.drivers!.find((d) => d.id === event.target.value);
+    formik.setFieldValue('driver', driver);
+  }
+
+  function handleDelete() {
+    props.onDelete();
+  }
+
   useEffect(initializeFinalStop, [props.settings]);
 
   return (
@@ -122,23 +172,32 @@ export function RouteScreen(props: RouteScreenProps) {
         <Typography variant="h5">
           Ruta: {formik.values.name || 'Sin Nombre'}
         </Typography>
+        <Typography variant="subtitle1">
+          Configure los detalles de la ruta.
+        </Typography>
       </div>
-      <Paper>
-        <Table>
-          <TableBody>
-            <TableRow>
-              <TableCell style={{ width: '20%' }}>
+      <Box maxWidth={1600}>
+        <Paper>
+          <Box margin={3}>
+            <Grid container spacing={3}>
+              <Grid item xs={12}>
+                <Typography variant="h6">Información General</Typography>
+                <Typography variant="subtitle1">
+                  Introduzca un nombre para la ruta y un transportista.
+                </Typography>
+              </Grid>
+              <Grid item xs={12} md={6}>
                 <TextField
                   name="name"
-                  label="Nombre"
+                  label="Nombre de Ruta"
                   variant="outlined"
                   value={formik.values.name}
                   onChange={formik.handleChange}
-                  error={!!formik.errors.name}
-                  helperText={formik.errors.name}
+                  error={formikUtils.fieldHasError('name')}
+                  helperText={formikUtils.getFieldHint('name')}
                 />
-              </TableCell>
-              <TableCell style={{ width: '20%' }}>
+              </Grid>
+              <Grid item xs={12} md={6}>
                 <FormControl variant="outlined" style={{ width: '100%' }}>
                   <InputLabel>Transportista</InputLabel>
                   <Select
@@ -153,32 +212,73 @@ export function RouteScreen(props: RouteScreenProps) {
                       ))}
                   </Select>
                 </FormControl>
-              </TableCell>
-              <TableCell style={{ width: '20%' }}>
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <TextField
+                  name="avgLoadTime"
+                  label="Tiempo promedio en cada parada"
+                  variant="outlined"
+                  value={formik.values.avgLoadTime}
+                  onChange={formik.handleChange}
+                  error={formikUtils.fieldHasError('avgLoadTime')}
+                  helperText={formikUtils.getFieldHint('avgLoadTime')}
+                />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <KeyboardDateTimePicker
+                  name="estimatedStartDate"
+                  label="Fecha/Hora Inicio Estimada"
+                  variant="inline"
+                  inputVariant="outlined"
+                  value={formik.values.estimatedStartDate}
+                  onChange={(value) => {
+                    formik.setFieldValue('estimatedStartDate', value);
+                    clearEstimatedEndDate();
+                  }}
+                  error={formikUtils.fieldHasError('estimatedStartDate')}
+                  helperText={formikUtils.getFieldHint('estimatedStartDate')}
+                  format="dd/MM/yyyy hh:mm a"
+                />
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <KeyboardDateTimePicker
+                  name="estimatedEndDate"
+                  label="Fecha/Hora Finalización Estimada"
+                  variant="inline"
+                  inputVariant="outlined"
+                  value={formik.values.estimatedEndDate}
+                  onChange={(value) => formik.setFieldValue('estimatedEndDate', value)} // prettier-ignore
+                  error={formikUtils.fieldHasError('estimatedEndDate')}
+                  helperText={formikUtils.getFieldHint('estimatedEndDate')}
+                  format="dd/MM/yyyy hh:mm a"
+                  disabled
+                />
+              </Grid>
+              <Grid item xs={12} md={6}>
                 <TextField
                   label="Distancia"
                   name="distance"
                   variant="outlined"
                   value={displayDistance(formik.values.distance)}
-                  error={!!formik.errors.distance}
-                  helperText={formik.errors.distance}
+                  error={formikUtils.fieldHasError('distance')}
+                  helperText={formikUtils.getFieldHint('distance')}
                   placeholder="Calcule la ruta"
                   disabled
                 />
-              </TableCell>
-              <TableCell style={{ width: '20%' }}>
+              </Grid>
+              <Grid item xs={12} md={6}>
                 <TextField
                   label="Duración"
                   name="duration"
                   variant="outlined"
-                  value={displayDuration(formik.values.duration)}
-                  error={!!formik.errors.duration}
-                  helperText={formik.errors.duration}
+                  value={displayDuration(formik.values.durationWithLoadTime)}
+                  error={formikUtils.fieldHasError('duration')}
+                  helperText={formikUtils.getFieldHint('duration')}
                   placeholder="Calcule la ruta"
                   disabled
                 />
-              </TableCell>
-              <TableCell style={{ width: '20%' }}>
+              </Grid>
+              <Grid item xs={12}>
                 <Button
                   variant="outlined"
                   color="primary"
@@ -186,69 +286,125 @@ export function RouteScreen(props: RouteScreenProps) {
                   disabled={formik.values.stops.length === 0}
                   onClick={handleCalculateClick}
                 >
-                  Calcular
+                  Optimizar Ruta
                 </Button>
                 <Button
                   type="submit"
                   variant="contained"
                   color="primary"
+                  style={{ marginRight: '1em' }}
                   disabled={!formik.isValid}
                   onClick={() => formik.handleSubmit()}
                 >
-                  Guardar
+                  Salvar Cambios
                 </Button>
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-
-        <div style={{ display: 'flex' }}>
-          <div className="RouteScreen_Destinations">
-            <Autocomplete
-              style={{ marginBottom: '1em' }}
-              multiple
-              filterSelectedOptions
-              options={(props.destinations || []).filter(
-                (dest) => !dest.isOwnCompany
-              )}
-              getOptionLabel={(option: Destination) => option.name}
-              value={formik.values.stops.map(
-                (stop: RouteStop) => stop.destination
-              )}
-              onChange={handleDestinationsChange}
-              renderInput={(params) => (
+                {props.route?.id && (
+                  <Button
+                    variant="outlined"
+                    color="default"
+                    startIcon={<DeleteIcon color="error" />}
+                    onClick={() => setDeleteDialogOpen(true)}
+                  >
+                    Eliminar Ruta
+                  </Button>
+                )}
+              </Grid>
+            </Grid>
+          </Box>
+          <Box margin={3}>
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={6}>
+                <Box marginBottom={2}>
+                  <Typography variant="h6">Destinos</Typography>
+                  <Typography variant="subtitle1">
+                    Seleccione destinos para crear las paradas en la ruta.
+                  </Typography>
+                </Box>
                 <TextField
-                  {...params}
-                  fullWidth
-                  variant="outlined"
-                  label="Destinos"
-                  placeholder="Seleccione destinos"
-                  error={!!formik.errors.stops}
-                  helperText={formik.errors.stops || ' '}
+                  label="Filtrar opciones"
+                  variant="filled"
+                  value={destinationsFilter}
+                  onChange={(e) => setDestinationsFilter(e.target.value)}
                 />
-              )}
-            />
+                <Box maxHeight={600} overflow="auto">
+                  <List>
+                    {(props.destinations || [])
+                      .filter((dest) => !dest.isOwnCompany)
+                      .filter(filterDestinations)
+                      .map((destination) => (
+                        <ListItem
+                          key={destination.id}
+                          role={undefined}
+                          dense
+                          button
+                          onClick={console.log}
+                        >
+                          <ListItemIcon>
+                            <Checkbox
+                              edge="start"
+                              checked={formik.values.stops.some(
+                                (stop) =>
+                                  stop.destination?.id === destination.id
+                              )}
+                              onChange={(event, checked) =>
+                                handleDestinationsChange(destination, checked)
+                              }
+                              tabIndex={-1}
+                              disableRipple
+                              color={true ? 'primary' : 'default'}
+                            />
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={destination.name}
+                            secondary={`Código: ${
+                              destination.code || 'Sin Código'
+                            }`}
+                          />
+                        </ListItem>
+                      ))}
+                  </List>
+                </Box>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <Box marginBottom={2}>
+                  <Typography variant="h6">Paradas</Typography>
+                  <Typography variant="subtitle1">
+                    Listados de paradas de la ruta en base a los destinos
+                    seleccionados.
+                  </Typography>
+                </Box>
+                {sortBy(formik.values.stops, 'waypointIndex').map(
+                  (routeStop: Partial<RouteStop>) => (
+                    <RouteStopCard
+                      key={routeStop.destination?.id}
+                      routeStop={routeStop}
+                      onTypeChange={handleRouteStopTypeChange}
+                    />
+                  )
+                )}
+              </Grid>
+            </Grid>
+          </Box>
 
-            {sortBy(formik.values.stops, 'waypointIndex').map(
-              (routeStop: RouteStop) => (
-                <RouteStopCard
-                  key={routeStop!.destination.id}
-                  routeStop={routeStop}
-                  onTypeChange={handleRouteStopTypeChange}
-                />
-              )
-            )}
+          <div style={{ display: 'flex' }}>
+            <div className="RouteScreen_Map">
+              <Map
+                companyPlace={props.settings!.destination}
+                routeStops={formik.values.stops as RouteStop[]}
+                routeGeometry={formik.values.geometry as RouteGeometry}
+                onDblClick={(lat, lng) => {}}
+              />
+            </div>
           </div>
-          <div className="RouteScreen_Map">
-            <Map
-              companyPlace={props.settings!.destination}
-              routeStops={formik.values.stops as RouteStop[]}
-              routeGeometry={formik.values.geometry as RouteGeometry}
-              onDblClick={(lat, lng) => {}}
-            />
-          </div>
-        </div>
-      </Paper>
+        </Paper>
+      </Box>
+      <ConfirmationDialog
+        open={deleteDialogOpen}
+        title="Eliminar Ruta"
+        body="¿Realmente desea eliminar esta ruta?"
+        onCancel={() => setDeleteDialogOpen(false)}
+        onConfirm={handleDelete}
+      />
     </div>
   );
 }

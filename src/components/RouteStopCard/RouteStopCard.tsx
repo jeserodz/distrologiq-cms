@@ -1,17 +1,16 @@
-import React from "react";
-import styled from "styled-components";
-import colors from "../../utils/colors";
-import { RouteStop, RouteStopTypeEnum } from "../../api";
-import { FormControl, InputLabel, Select, MenuItem } from "@material-ui/core";
+import React from 'react';
+import styled from 'styled-components';
+import colors from '../../utils/colors';
+import { RouteStop, RouteStopTypeEnum } from '../../api';
+import { FormControl, InputLabel, Select, MenuItem } from '@material-ui/core';
 
 interface RouteStopCardProps {
-  routeStop: RouteStop;
-  onTypeChange: (routeStop: RouteStop, type: RouteStopTypeEnum) => any;
+  routeStop: Partial<RouteStop>;
+  onTypeChange: (routeStop: Partial<RouteStop>, type: RouteStopTypeEnum) => any;
 }
 
 const Container = styled.div<{ arrival: boolean }>`
   width: 100%;
-  max-width: 400px;
   padding: 1rem;
   border: ${(p) => (p.arrival ? 3 : 1)}px solid #ccc;
   border-radius: 4px;
@@ -29,8 +28,8 @@ const Title = styled.div`
 export function RouteStopCard({ routeStop, onTypeChange }: RouteStopCardProps) {
   return (
     <Container arrival={routeStop.type === RouteStopTypeEnum.ARRIVAL}>
-      <Title>{routeStop.destination.name}</Title>
-      <FormControl style={{ width: "100%" }}>
+      <Title>{routeStop.destination?.name}</Title>
+      <FormControl style={{ width: '100%' }}>
         <InputLabel>Tipo de parada</InputLabel>
         <Select
           value={routeStop.type}

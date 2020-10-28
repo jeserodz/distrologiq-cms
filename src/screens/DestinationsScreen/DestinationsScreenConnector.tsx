@@ -1,13 +1,12 @@
 import React, { useContext } from 'react';
-import { useHistory, useLocation } from 'react-router';
+import { RouteComponentProps, useNavigate } from '@reach/router';
 import { DestinationsScreen } from './DestinationsScreen';
 import { useQuery } from 'react-query';
 import { Context } from '../../Context';
 import { DestinationsApi, Destination } from '../../api';
 
-export function DestinationsScreenConnector() {
-  const history = useHistory();
-  const location = useLocation();
+export function DestinationsScreenConnector(props: RouteComponentProps) {
+  const navigate = useNavigate();
   const context = useContext(Context);
 
   const destinationsApi = new DestinationsApi(context.getApiConfig());
@@ -17,11 +16,11 @@ export function DestinationsScreenConnector() {
   );
 
   function handleDestinationPress(destination: Destination) {
-    history.push(`${location.pathname}/${destination.id}`);
+    navigate(`./destinations/${destination.id}`);
   }
 
   function handleCreatePress() {
-    history.push(`${location.pathname}/new`);
+    navigate(`./destinations/new`);
   }
 
   return fetchDestinationsResponse.data ? (

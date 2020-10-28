@@ -1,29 +1,21 @@
-import React from "react";
+import React from 'react';
 import {
   Button,
   TextField,
   Dialog,
   DialogTitle,
   DialogActions,
-} from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
-import { Formik } from "formik";
-import * as Yup from "yup";
-import { User } from "../../api";
-
-export interface SimpleDialogProps {
-  user?: User | undefined;
-  onSubmit?: (values: any) => void;
-  onClose: () => void;
-  open: boolean;
-  style?: any;
-}
+} from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
+import { Formik } from 'formik';
+import * as Yup from 'yup';
+import { User } from '../../api';
 
 const formSchema = Yup.object().shape({
-  password: Yup.string().required("Campo requerido"),
+  password: Yup.string().required('Campo requerido'),
   confirmPassword: Yup.string()
-    .required("Campo requerido")
-    .test("matchPassword", "Ambas contraseñas deben ser iguales", function (
+    .required('Campo requerido')
+    .test('matchPassword', 'Ambas contraseñas deben ser iguales', function (
       value: String
     ) {
       return this.parent.password === value;
@@ -31,23 +23,23 @@ const formSchema = Yup.object().shape({
 });
 
 const initialValues = {
-  password: "",
-  confirmPassword: "",
+  password: '',
+  confirmPassword: '',
 };
 
 const useStyles = makeStyles({
   dialogContainer: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   contentContainer: {
     flex: 1,
     minWidth: 500,
     padding: 33,
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-start",
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
   },
   dialogTitle: {
     paddingLeft: 0,
@@ -56,34 +48,33 @@ const useStyles = makeStyles({
     marginBottom: 10,
   },
   dialogButtons: {
-    alignSelf: "flex-end",
+    alignSelf: 'flex-end',
     marginTop: 20,
   },
 });
 
+export interface SimpleDialogProps {
+  user?: User | undefined;
+  onSubmit: (values: any) => any;
+  onClose: () => void;
+  open: boolean;
+  style?: any;
+}
+
 export function SimpleDialog(props: SimpleDialogProps) {
-  const { onClose, open } = props;
   const classes = useStyles();
-
-  function handleClose() {
-    return onClose;
-  }
-
-  function handleSubmit(values: any) {
-    console.log(values);
-  }
 
   return (
     <Formik
       validationSchema={formSchema}
       initialValues={initialValues}
-      onSubmit={handleSubmit}
+      onSubmit={(values) => props.onSubmit({ password: values.password })}
     >
       {({ values, errors, handleSubmit, handleChange }) => (
         <Dialog
-          onClose={handleClose}
+          onClose={props.onClose}
           aria-labelledby="simple-dialog-title"
-          open={open}
+          open={props.open}
           style={props.style}
           className={classes.dialogContainer}
         >
@@ -117,7 +108,7 @@ export function SimpleDialog(props: SimpleDialogProps) {
               variant="outlined"
             />
             <DialogActions className={classes.dialogButtons}>
-              <Button onClick={handleClose} color="default">
+              <Button onClick={props.onClose} color="default">
                 Cancelar
               </Button>
               <Button onClick={() => handleSubmit()} color="primary">
