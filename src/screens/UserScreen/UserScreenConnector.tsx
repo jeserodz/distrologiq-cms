@@ -1,10 +1,11 @@
 import React, { useContext } from 'react';
 import { RouteComponentProps, useNavigate, useParams } from '@reach/router';
-import { useQuery, useMutation } from 'react-query';
+import { useQuery } from 'react-query';
 import { Toaster } from '../../utils/toaster';
 import { UserScreen } from './UserScreen';
-import { UsersApi, CreateUserDTO, User, UpdateUserDTO } from '../../api';
+import { UsersApi, CreateUserDTO, UpdateUserDTO } from '../../api';
 import { Context } from '../../Context';
+import { LoadingOverlay } from '../../components/LoadingOverlay/LoadingOverlay';
 
 export function UserScreenConnector(props: RouteComponentProps) {
   const { id } = useParams();
@@ -47,5 +48,7 @@ export function UserScreenConnector(props: RouteComponentProps) {
         navigate(`/dashboard/users/${user.id}/analytics`);
       }}
     />
-  ) : null;
+  ) : (
+    <LoadingOverlay />
+  );
 }

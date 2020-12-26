@@ -9,13 +9,13 @@ import {
   CalculateRouteDTO,
   CreateRouteDTO,
   UpdateRouteDTO,
-  RouteStop,
   Route,
   Destination,
   User,
   Settings,
   CalculateRouteResponse,
 } from '../../api';
+import { LoadingOverlay } from '../../components/LoadingOverlay/LoadingOverlay';
 
 export function RouteScreenConnector(props: RouteComponentProps) {
   const { id } = useParams();
@@ -164,5 +164,7 @@ export function RouteScreenConnector(props: RouteComponentProps) {
       }
       onDelete={deleteRoute}
     />
-  ) : null;
+  ) : (
+    <LoadingOverlay />
+  );
 }

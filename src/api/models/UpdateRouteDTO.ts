@@ -36,12 +36,6 @@ import {
 export interface UpdateRouteDTO {
     /**
      * 
-     * @type {number}
-     * @memberof UpdateRouteDTO
-     */
-    id: number;
-    /**
-     * 
      * @type {string}
      * @memberof UpdateRouteDTO
      */
@@ -52,6 +46,12 @@ export interface UpdateRouteDTO {
      * @memberof UpdateRouteDTO
      */
     distance: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof UpdateRouteDTO
+     */
+    avgLoadTime: number;
     /**
      * 
      * @type {number}
@@ -72,10 +72,28 @@ export interface UpdateRouteDTO {
     estimatedStartDate: Date;
     /**
      * 
+     * @type {Date}
+     * @memberof UpdateRouteDTO
+     */
+    estimatedEndDate: Date;
+    /**
+     * 
      * @type {RouteGeometry}
      * @memberof UpdateRouteDTO
      */
     geometry: RouteGeometry;
+    /**
+     * 
+     * @type {Array<RouteStop>}
+     * @memberof UpdateRouteDTO
+     */
+    stops: Array<RouteStop>;
+    /**
+     * 
+     * @type {User}
+     * @memberof UpdateRouteDTO
+     */
+    driver: User;
     /**
      * 
      * @type {Date}
@@ -94,30 +112,6 @@ export interface UpdateRouteDTO {
      * @memberof UpdateRouteDTO
      */
     completedDuration: number;
-    /**
-     * 
-     * @type {Array<RouteStop>}
-     * @memberof UpdateRouteDTO
-     */
-    stops: Array<RouteStop>;
-    /**
-     * 
-     * @type {User}
-     * @memberof UpdateRouteDTO
-     */
-    driver: User;
-    /**
-     * 
-     * @type {Date}
-     * @memberof UpdateRouteDTO
-     */
-    estimatedEndDate: Date;
-    /**
-     * 
-     * @type {number}
-     * @memberof UpdateRouteDTO
-     */
-    avgLoadTime: number;
 }
 
 export function UpdateRouteDTOFromJSON(json: any): UpdateRouteDTO {
@@ -130,20 +124,19 @@ export function UpdateRouteDTOFromJSONTyped(json: any, ignoreDiscriminator: bool
     }
     return {
         
-        'id': json['id'],
         'name': json['name'],
         'distance': json['distance'],
+        'avgLoadTime': json['avgLoadTime'],
         'duration': json['duration'],
         'durationWithLoadTime': json['durationWithLoadTime'],
         'estimatedStartDate': (new Date(json['estimatedStartDate'])),
+        'estimatedEndDate': (new Date(json['estimatedEndDate'])),
         'geometry': RouteGeometryFromJSON(json['geometry']),
+        'stops': ((json['stops'] as Array<any>).map(RouteStopFromJSON)),
+        'driver': UserFromJSON(json['driver']),
         'started': (new Date(json['started'])),
         'completed': (new Date(json['completed'])),
         'completedDuration': json['completedDuration'],
-        'stops': ((json['stops'] as Array<any>).map(RouteStopFromJSON)),
-        'driver': UserFromJSON(json['driver']),
-        'estimatedEndDate': (new Date(json['estimatedEndDate'])),
-        'avgLoadTime': json['avgLoadTime'],
     };
 }
 
@@ -156,20 +149,19 @@ export function UpdateRouteDTOToJSON(value?: UpdateRouteDTO | null): any {
     }
     return {
         
-        'id': value.id,
         'name': value.name,
         'distance': value.distance,
+        'avgLoadTime': value.avgLoadTime,
         'duration': value.duration,
         'durationWithLoadTime': value.durationWithLoadTime,
         'estimatedStartDate': (value.estimatedStartDate.toISOString()),
+        'estimatedEndDate': (value.estimatedEndDate.toISOString()),
         'geometry': RouteGeometryToJSON(value.geometry),
+        'stops': ((value.stops as Array<any>).map(RouteStopToJSON)),
+        'driver': UserToJSON(value.driver),
         'started': (value.started.toISOString()),
         'completed': (value.completed.toISOString()),
         'completedDuration': value.completedDuration,
-        'stops': ((value.stops as Array<any>).map(RouteStopToJSON)),
-        'driver': UserToJSON(value.driver),
-        'estimatedEndDate': (value.estimatedEndDate.toISOString()),
-        'avgLoadTime': value.avgLoadTime,
     };
 }
 

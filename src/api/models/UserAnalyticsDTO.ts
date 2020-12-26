@@ -65,6 +65,12 @@ export interface UserAnalyticsDTO {
      * @type {number}
      * @memberof UserAnalyticsDTO
      */
+    averageRouteDuration: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof UserAnalyticsDTO
+     */
     accumulatedDistance: number;
     /**
      * 
@@ -95,6 +101,7 @@ export function UserAnalyticsDTOFromJSONTyped(json: any, ignoreDiscriminator: bo
         'pendingRoutesCount': json['pendingRoutesCount'],
         'averagePerformance': json['averagePerformance'],
         'averageVisits': json['averageVisits'],
+        'averageRouteDuration': json['averageRouteDuration'],
         'accumulatedDistance': json['accumulatedDistance'],
         'performanceHistoryChart': ((json['performanceHistoryChart'] as Array<any>).map(PerformanceHistoryChartItemFromJSON)),
         'user': UserAnalyticsDTOUserFromJSON(json['user']),
@@ -115,6 +122,7 @@ export function UserAnalyticsDTOToJSON(value?: UserAnalyticsDTO | null): any {
         'pendingRoutesCount': value.pendingRoutesCount,
         'averagePerformance': value.averagePerformance,
         'averageVisits': value.averageVisits,
+        'averageRouteDuration': value.averageRouteDuration,
         'accumulatedDistance': value.accumulatedDistance,
         'performanceHistoryChart': ((value.performanceHistoryChart as Array<any>).map(PerformanceHistoryChartItemToJSON)),
         'user': UserAnalyticsDTOUserToJSON(value.user),

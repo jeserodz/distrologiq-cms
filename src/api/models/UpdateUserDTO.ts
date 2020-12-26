@@ -13,6 +13,13 @@
  */
 
 import { exists, mapValues } from '../runtime';
+import {
+    UserRoles,
+    UserRolesFromJSON,
+    UserRolesFromJSONTyped,
+    UserRolesToJSON,
+} from './';
+
 /**
  * 
  * @export
@@ -43,6 +50,12 @@ export interface UpdateUserDTO {
      * @memberof UpdateUserDTO
      */
     email?: string;
+    /**
+     * 
+     * @type {UserRoles}
+     * @memberof UpdateUserDTO
+     */
+    roles?: UserRoles;
 }
 
 export function UpdateUserDTOFromJSON(json: any): UpdateUserDTO {
@@ -59,6 +72,7 @@ export function UpdateUserDTOFromJSONTyped(json: any, ignoreDiscriminator: boole
         'password': !exists(json, 'password') ? undefined : json['password'],
         'displayName': !exists(json, 'displayName') ? undefined : json['displayName'],
         'email': !exists(json, 'email') ? undefined : json['email'],
+        'roles': !exists(json, 'roles') ? undefined : UserRolesFromJSON(json['roles']),
     };
 }
 
@@ -75,6 +89,7 @@ export function UpdateUserDTOToJSON(value?: UpdateUserDTO | null): any {
         'password': value.password,
         'displayName': value.displayName,
         'email': value.email,
+        'roles': UserRolesToJSON(value.roles),
     };
 }
 

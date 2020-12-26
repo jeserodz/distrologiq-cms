@@ -17,7 +17,6 @@ import {
   FormControl,
   Grid,
   Box,
-  useTheme,
 } from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { KeyboardDateTimePicker } from '@material-ui/pickers';
@@ -41,6 +40,7 @@ import {
   CalculateRouteDTO,
 } from '../../api';
 import { ConfirmationDialog } from '../../components/ConfirmationDialog';
+import { RouteReportDialog } from './RouteReportDialog';
 
 export interface RouteScreenProps {
   route: Route | undefined;
@@ -56,6 +56,7 @@ export interface RouteScreenProps {
 
 export function RouteScreen(props: RouteScreenProps) {
   const [destinationsFilter, setDestinationsFilter] = useState('');
+  const [printDialogOpen, setPrintDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const formik = useFormik<RouteScreenForm>({
@@ -288,6 +289,17 @@ export function RouteScreen(props: RouteScreenProps) {
                 >
                   Optimizar Ruta
                 </Button>
+                {props.route && (
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    style={{ marginRight: '1em' }}
+                    disabled={formik.values.stops.length === 0}
+                    onClick={() => setPrintDialogOpen(true)}
+                  >
+                    Imprimir Ruta
+                  </Button>
+                )}
                 <Button
                   type="submit"
                   variant="contained"
@@ -398,6 +410,13 @@ export function RouteScreen(props: RouteScreenProps) {
           </div>
         </Paper>
       </Box>
+      {props.route && (
+        <RouteReportDialog
+          open={printDialogOpen}
+          route={props.route}
+          onClose={() => setPrintDialogOpen(false)}
+        />
+      )}
       <ConfirmationDialog
         open={deleteDialogOpen}
         title="Eliminar Ruta"

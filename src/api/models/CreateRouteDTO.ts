@@ -51,6 +51,12 @@ export interface CreateRouteDTO {
      * @type {number}
      * @memberof CreateRouteDTO
      */
+    avgLoadTime: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof CreateRouteDTO
+     */
     duration: number;
     /**
      * 
@@ -64,6 +70,12 @@ export interface CreateRouteDTO {
      * @memberof CreateRouteDTO
      */
     estimatedStartDate: Date;
+    /**
+     * 
+     * @type {Date}
+     * @memberof CreateRouteDTO
+     */
+    estimatedEndDate: Date;
     /**
      * 
      * @type {RouteGeometry}
@@ -82,18 +94,6 @@ export interface CreateRouteDTO {
      * @memberof CreateRouteDTO
      */
     driver?: User;
-    /**
-     * 
-     * @type {Date}
-     * @memberof CreateRouteDTO
-     */
-    estimatedEndDate: Date;
-    /**
-     * 
-     * @type {number}
-     * @memberof CreateRouteDTO
-     */
-    avgLoadTime: number;
 }
 
 export function CreateRouteDTOFromJSON(json: any): CreateRouteDTO {
@@ -108,14 +108,14 @@ export function CreateRouteDTOFromJSONTyped(json: any, ignoreDiscriminator: bool
         
         'name': json['name'],
         'distance': json['distance'],
+        'avgLoadTime': json['avgLoadTime'],
         'duration': json['duration'],
         'durationWithLoadTime': json['durationWithLoadTime'],
         'estimatedStartDate': (new Date(json['estimatedStartDate'])),
+        'estimatedEndDate': (new Date(json['estimatedEndDate'])),
         'geometry': RouteGeometryFromJSON(json['geometry']),
         'stops': ((json['stops'] as Array<any>).map(RouteStopFromJSON)),
         'driver': !exists(json, 'driver') ? undefined : UserFromJSON(json['driver']),
-        'estimatedEndDate': (new Date(json['estimatedEndDate'])),
-        'avgLoadTime': json['avgLoadTime'],
     };
 }
 
@@ -130,14 +130,14 @@ export function CreateRouteDTOToJSON(value?: CreateRouteDTO | null): any {
         
         'name': value.name,
         'distance': value.distance,
+        'avgLoadTime': value.avgLoadTime,
         'duration': value.duration,
         'durationWithLoadTime': value.durationWithLoadTime,
         'estimatedStartDate': (value.estimatedStartDate.toISOString()),
+        'estimatedEndDate': (value.estimatedEndDate.toISOString()),
         'geometry': RouteGeometryToJSON(value.geometry),
         'stops': ((value.stops as Array<any>).map(RouteStopToJSON)),
         'driver': UserToJSON(value.driver),
-        'estimatedEndDate': (value.estimatedEndDate.toISOString()),
-        'avgLoadTime': value.avgLoadTime,
     };
 }
 

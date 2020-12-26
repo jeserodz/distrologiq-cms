@@ -2,40 +2,18 @@ import React, { useContext } from 'react';
 import { RouteComponentProps, useParams } from '@reach/router';
 import { useQuery } from 'react-query';
 import { Typography, Paper, Grid, Box } from '@material-ui/core'; // prettier-ignore
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts'; // prettier-ignore
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Brush } from 'recharts'; // prettier-ignore
 import { AnalyticsApi } from '../../api';
 import { Context } from '../../Context';
-
-const sampleData = [
-  {
-    name: 'Ruta A',
-    duration: 4000,
-    completedDuration: 2400,
-  },
-  {
-    name: 'Ruta B',
-    duration: 3000,
-    completedDuration: 1398,
-  },
-  {
-    name: 'Ruta B',
-    duration: 2000,
-    completedDuration: 9800,
-  },
-  {
-    name: 'Ruta C',
-    duration: 2780,
-    completedDuration: 3908,
-  },
-];
+import { displayDuration } from '../../utils/display-helpers';
+import { LoadingOverlay } from '../../components/LoadingOverlay/LoadingOverlay';
 
 export function UserAnalyticsScreen(props: RouteComponentProps) {
   const { id } = useParams();
   const context = useContext(Context);
   const analyticsApi = new AnalyticsApi(context.getApiConfig());
-  const [chartWidth, setChartWidth] = React.useState(0);
 
-  const { data } = useQuery(['getUserAnalytics'], () =>
+  const { data } = useQuery('getUserAnalytics', () =>
     analyticsApi.getUserAnalytics(id)
   );
 
@@ -90,7 +68,7 @@ export function UserAnalyticsScreen(props: RouteComponentProps) {
                 <Box padding={1}>
                   <Typography variant="subtitle2">Desempeño</Typography>
                   <Typography variant="h4">
-                    {data.averagePerformance * 100}%
+                    {Math.round(data.averagePerformance * 100)}%
                   </Typography>
                 </Box>
               </Paper>
@@ -100,7 +78,9 @@ export function UserAnalyticsScreen(props: RouteComponentProps) {
             <Box margin={1}>
               <Paper>
                 <Box padding={1}>
-                  <Typography variant="subtitle2">Visitas Promedio</Typography>
+                  <Typography variant="subtitle2">
+                    Visitas por Ruta Promedio
+                  </Typography>
                   <Typography variant="h4">{data.averageVisits}</Typography>
                 </Box>
               </Paper>
@@ -111,10 +91,10 @@ export function UserAnalyticsScreen(props: RouteComponentProps) {
               <Paper>
                 <Box padding={1}>
                   <Typography variant="subtitle2">
-                    Kilómetros Recorridos
+                    Duración Ruta Promedio
                   </Typography>
                   <Typography variant="h4">
-                    {data.accumulatedDistance}
+                    {displayDuration(data.averageRouteDuration)}
                   </Typography>
                 </Box>
               </Paper>
@@ -127,33 +107,49 @@ export function UserAnalyticsScreen(props: RouteComponentProps) {
                   <Typography variant="subtitle2">
                     Desempeño Histórico
                   </Typography>
-                  <div
-                    ref={(element) =>
-                      setChartWidth(
-                        element ? element.getBoundingClientRect().width : 0
-                      )
-                    }
-                  >
-                    <BarChart
-                      width={chartWidth}
-                      height={300}
-                      data={sampleData}
-                      margin={{
-                        top: 30,
-                        right: 30,
-                        left: 20,
-                        bottom: 5,
-                      }}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="name" />
-                      <YAxis />
-                      <Tooltip />
-                      <Legend />
-                      <Bar dataKey="duration" fill="#8884d8" />
-                      <Bar dataKey="completedDuration" fill="#82ca9d" />
-                    </BarChart>
-                  </div>
+                  <Box padding={2}>
+                    <ResponsiveContainer width="100%" minHeight={300}>
+                      <BarChart
+                        data={data.performanceHistoryChart}
+                        barSize={50}
+                        barGap={5}
+                        barCategoryGap={25}
+                        style={{ fontFamily: 'Roboto' }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <YAxis
+                          tickFormatter={(value) =>
+                            value ? displayDuration(value) : '0:00:00'
+                          }
+                        />
+                        <XAxis dataKey="routeName" />
+                        <Bar
+                          name="Tiempo Estimado"
+                          dataKey="duration"
+                          fill="#433E31"
+                        />
+                        <Bar
+                          name="Tiempo Completado"
+                          dataKey="completedDuration"
+                          fill="#D6A641"
+                        />
+                        <Tooltip
+                          formatter={(value) =>
+                            displayDuration(parseInt(String(value)))
+                          }
+                          cursor={{
+                            fill: 'rgba(0,0,0,0.7)',
+                          }}
+                        />
+                        <Legend verticalAlign="top" height={40} />
+                        <Brush
+                          dataKey="routeName"
+                          height={30}
+                          stroke="#D6A641"
+                        />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </Box>
                 </Box>
               </Paper>
             </Box>
@@ -161,5 +157,7 @@ export function UserAnalyticsScreen(props: RouteComponentProps) {
         </Grid>
       </Box>
     </div>
-  ) : null;
+  ) : (
+    <LoadingOverlay />
+  );
 }

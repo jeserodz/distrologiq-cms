@@ -1,13 +1,14 @@
 import React from 'react';
 import ReactMapGL, { Marker, FlyToInterpolator } from 'react-map-gl';
 import { MyLocation, Business } from '@material-ui/icons';
-import { RouteStop, RouteGeometry } from '../../api';
+import { RouteStop, RouteGeometry, Destination } from '../../api';
 import { Place } from '../../types';
 import { drawDirections } from '../../utils/map';
+import { Chip } from '@material-ui/core';
 
 export interface MapProps {
-  companyPlace?: { latitude: number; longitude: number };
-  place?: { latitude: number; longitude: number } | null | undefined;
+  companyPlace?: Partial<Place> | Partial<Destination>;
+  place?: Partial<Place> | Partial<Destination> | null | undefined;
   focusedPlace?: Place | null | undefined;
   routeStops?: RouteStop[];
   routeGeometry?: RouteGeometry;
@@ -58,12 +59,16 @@ export function Map(props: MapProps) {
     >
       {props.place && (
         <Marker
-          latitude={props.place.latitude}
-          longitude={props.place.longitude}
+          latitude={props.place.latitude!}
+          longitude={props.place.longitude!}
           offsetLeft={-20}
           offsetTop={-20}
         >
-          <MyLocation color="error" style={{ fontSize: 40 }} />
+          <Chip
+            color="primary"
+            icon={<MyLocation />}
+            label={props.place.name}
+          />
         </Marker>
       )}
 
@@ -74,7 +79,11 @@ export function Map(props: MapProps) {
           offsetLeft={-20}
           offsetTop={-20}
         >
-          <MyLocation color="error" style={{ fontSize: 40 }} />
+          <Chip
+            color="primary"
+            icon={<MyLocation />}
+            label={props.focusedPlace.name}
+          />
         </Marker>
       )}
 
@@ -87,18 +96,26 @@ export function Map(props: MapProps) {
             offsetLeft={-20}
             offsetTop={-20}
           >
-            <MyLocation color="error" style={{ fontSize: 40 }} />
+            <Chip
+              color="primary"
+              icon={<MyLocation />}
+              label={stop.destination.name}
+            />
           </Marker>
         ))}
 
       {props.companyPlace && (
         <Marker
-          latitude={props.companyPlace.latitude}
-          longitude={props.companyPlace.longitude}
+          latitude={props.companyPlace.latitude!}
+          longitude={props.companyPlace.longitude!}
           offsetLeft={-20}
           offsetTop={-20}
         >
-          <Business color="error" style={{ fontSize: 40 }} />
+          <Chip
+            color="primary"
+            icon={<Business />}
+            label={props.companyPlace.name}
+          />
         </Marker>
       )}
     </ReactMapGL>

@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import { RouteComponentProps, useNavigate } from '@reach/router';
 import { DestinationsScreen } from './DestinationsScreen';
+import { LoadingOverlay } from '../../components/LoadingOverlay/LoadingOverlay';
 import { useQuery } from 'react-query';
 import { Context } from '../../Context';
 import { DestinationsApi, Destination } from '../../api';
@@ -29,5 +30,7 @@ export function DestinationsScreenConnector(props: RouteComponentProps) {
       onDestinationPress={handleDestinationPress}
       onCreatePress={handleCreatePress}
     />
-  ) : null;
+  ) : (
+    <LoadingOverlay />
+  );
 }

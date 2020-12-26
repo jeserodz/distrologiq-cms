@@ -6,6 +6,7 @@ import { SettingsScreen } from './SettingsScreen';
 import { SettingsForm } from './SettingsForm';
 import { SettingsApi, SetSettingsDTO } from '../../api';
 import { Context } from '../../Context';
+import { LoadingOverlay } from '../../components/LoadingOverlay/LoadingOverlay';
 
 export function SettingsScreenConnector(props: RouteComponentProps) {
   const context = useContext(Context);
@@ -39,5 +40,7 @@ export function SettingsScreenConnector(props: RouteComponentProps) {
       }}
       onSubmit={handleSubmit}
     />
-  ) : null;
+  ) : (
+    <LoadingOverlay />
+  );
 }

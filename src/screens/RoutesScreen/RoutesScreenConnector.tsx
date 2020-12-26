@@ -6,6 +6,7 @@ import { RoutesScreen } from './RoutesScreen';
 import { Route } from '../../api';
 import { Context } from '../../Context';
 import { AxiosError } from 'axios';
+import { LoadingOverlay } from '../../components/LoadingOverlay/LoadingOverlay';
 
 export function RoutesScreenConnector(props: RouteComponentProps) {
   const navigate = useNavigate();
@@ -33,11 +34,13 @@ export function RoutesScreenConnector(props: RouteComponentProps) {
     navigate('/dashboard/routes/new');
   }
 
-  return (
+  return getRoutes.data ? (
     <RoutesScreen
-      routes={getRoutes.data || []}
+      routes={getRoutes.data}
       onRoutePress={handleRoutePress}
       onCreatePress={handleCreatePress}
     />
+  ) : (
+    <LoadingOverlay />
   );
 }

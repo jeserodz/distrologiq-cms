@@ -28,7 +28,6 @@ export function UserScreen(props: UserScreenProps) {
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
 
   function handleSubmit(values: any) {
-    console.log(values);
     props.onSubmit(values);
   }
 
@@ -144,28 +143,38 @@ export function UserScreen(props: UserScreenProps) {
                       <TableRow>
                         <TableCell>
                           <FormControlLabel
+                            label="Administrador"
                             control={
                               <Checkbox
-                                checked={values.roles?.admin || false}
-                                // onChange={handleChange}
                                 name="admin"
                                 color="primary"
+                                checked={values.roles?.admin || false}
+                                onChange={(event, value) =>
+                                  setFieldValue('roles', {
+                                    ...values.roles,
+                                    admin: value,
+                                  })
+                                }
                               />
                             }
-                            label="Administrador"
                           />
                         </TableCell>
                         <TableCell>
                           <FormControlLabel
+                            label="Transportista"
                             control={
                               <Checkbox
                                 checked={values.roles?.driver || false}
-                                // onChange={handleChange}
                                 name="driver"
                                 color="primary"
+                                onChange={(event, value) =>
+                                  setFieldValue('roles', {
+                                    ...values.roles,
+                                    driver: value,
+                                  })
+                                }
                               />
                             }
-                            label="Transportista"
                           />
                         </TableCell>
                       </TableRow>

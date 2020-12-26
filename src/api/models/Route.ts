@@ -51,6 +51,12 @@ export interface Route {
      * @type {number}
      * @memberof Route
      */
+    avgLoadTime: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof Route
+     */
     distance: number;
     /**
      * 
@@ -124,12 +130,6 @@ export interface Route {
      * @memberof Route
      */
     updatedAt: Date;
-    /**
-     * 
-     * @type {number}
-     * @memberof Route
-     */
-    avgLoadTime: number;
 }
 
 export function RouteFromJSON(json: any): Route {
@@ -144,6 +144,7 @@ export function RouteFromJSONTyped(json: any, ignoreDiscriminator: boolean): Rou
         
         'id': json['id'],
         'name': json['name'],
+        'avgLoadTime': json['avgLoadTime'],
         'distance': json['distance'],
         'duration': json['duration'],
         'durationWithLoadTime': json['durationWithLoadTime'],
@@ -157,7 +158,6 @@ export function RouteFromJSONTyped(json: any, ignoreDiscriminator: boolean): Rou
         'driver': UserFromJSON(json['driver']),
         'createdAt': (new Date(json['createdAt'])),
         'updatedAt': (new Date(json['updatedAt'])),
-        'avgLoadTime': json['avgLoadTime'],
     };
 }
 
@@ -172,6 +172,7 @@ export function RouteToJSON(value?: Route | null): any {
         
         'id': value.id,
         'name': value.name,
+        'avgLoadTime': value.avgLoadTime,
         'distance': value.distance,
         'duration': value.duration,
         'durationWithLoadTime': value.durationWithLoadTime,
@@ -185,7 +186,6 @@ export function RouteToJSON(value?: Route | null): any {
         'driver': UserToJSON(value.driver),
         'createdAt': (value.createdAt.toISOString()),
         'updatedAt': (value.updatedAt.toISOString()),
-        'avgLoadTime': value.avgLoadTime,
     };
 }
 

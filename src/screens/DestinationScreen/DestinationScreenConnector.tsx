@@ -5,12 +5,12 @@ import { useQuery, useMutation } from 'react-query';
 import { Toaster } from '../../utils/toaster';
 import { Context } from '../../Context';
 import {
-  DestinationsApi,
   CreateDestinationDTO,
   UpdateDestinationDTO,
   Destination,
 } from '../../api';
 import { AxiosError } from 'axios';
+import { LoadingOverlay } from '../../components/LoadingOverlay/LoadingOverlay';
 
 export function DestinationScreenConnector(props: RouteComponentProps) {
   const { id } = useParams();
@@ -66,14 +66,32 @@ export function DestinationScreenConnector(props: RouteComponentProps) {
     }
   );
 
+  const [deleteDestination] = useMutation(
+    async () => {
+      await api.delete(`/destinations/${id}`);
+    },
+    {
+      onSuccess: () => {
+        Toaster.show('success', 'Destino eliminado');
+        navigate('/dashboard/destinations');
+      },
+      onError: (error: AxiosError) => {
+        Toaster.show('error', error.response?.data.message || error.message);
+      },
+    }
+  );
+
   return id === 'new' || getDestination.data ? (
     <DestinationScreen
       destination={getDestination.data}
+      onDelete={() => deleteDestination()}
       onSubmit={(data) =>
         id === 'new'
           ? createDestination(data as CreateDestinationDTO)
           : updateDestination(data as UpdateDestinationDTO)
       }
     />
-  ) : null;
+  ) : (
+    <LoadingOverlay />
+  );
 }

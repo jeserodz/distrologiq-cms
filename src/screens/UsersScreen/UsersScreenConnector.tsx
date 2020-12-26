@@ -4,6 +4,7 @@ import { useQuery } from 'react-query';
 import { UsersScreen } from './UsersScreen';
 import { UsersApi, User } from '../../api';
 import { Context } from '../../Context';
+import { LoadingOverlay } from '../../components/LoadingOverlay/LoadingOverlay';
 
 export function UsersScreenConnector(props: RouteComponentProps) {
   const navigate = useNavigate();
@@ -26,5 +27,7 @@ export function UsersScreenConnector(props: RouteComponentProps) {
       onUserPress={handleUserPress}
       onCreatePress={handleCreatePress}
     />
-  ) : null;
+  ) : (
+    <LoadingOverlay />
+  );
 }

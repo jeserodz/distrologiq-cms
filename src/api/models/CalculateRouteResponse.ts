@@ -28,6 +28,24 @@ import {
 export interface CalculateRouteResponse {
     /**
      * 
+     * @type {Date}
+     * @memberof CalculateRouteResponse
+     */
+    estimatedStartDate: Date;
+    /**
+     * 
+     * @type {Date}
+     * @memberof CalculateRouteResponse
+     */
+    estimatedEndDate: Date;
+    /**
+     * 
+     * @type {number}
+     * @memberof CalculateRouteResponse
+     */
+    avgLoadTime: number;
+    /**
+     * 
      * @type {number}
      * @memberof CalculateRouteResponse
      */
@@ -56,24 +74,6 @@ export interface CalculateRouteResponse {
      * @memberof CalculateRouteResponse
      */
     optimizedRouteStops: Array<object>;
-    /**
-     * 
-     * @type {Date}
-     * @memberof CalculateRouteResponse
-     */
-    estimatedStartDate: Date;
-    /**
-     * 
-     * @type {Date}
-     * @memberof CalculateRouteResponse
-     */
-    estimatedEndDate: Date;
-    /**
-     * 
-     * @type {number}
-     * @memberof CalculateRouteResponse
-     */
-    avgLoadTime: number;
 }
 
 export function CalculateRouteResponseFromJSON(json: any): CalculateRouteResponse {
@@ -86,14 +86,14 @@ export function CalculateRouteResponseFromJSONTyped(json: any, ignoreDiscriminat
     }
     return {
         
+        'estimatedStartDate': (new Date(json['estimatedStartDate'])),
+        'estimatedEndDate': (new Date(json['estimatedEndDate'])),
+        'avgLoadTime': json['avgLoadTime'],
         'distance': json['distance'],
         'duration': json['duration'],
         'durationWithLoadTime': json['durationWithLoadTime'],
         'geometry': RouteGeometryFromJSON(json['geometry']),
         'optimizedRouteStops': json['optimizedRouteStops'],
-        'estimatedStartDate': (new Date(json['estimatedStartDate'])),
-        'estimatedEndDate': (new Date(json['estimatedEndDate'])),
-        'avgLoadTime': json['avgLoadTime'],
     };
 }
 
@@ -106,14 +106,14 @@ export function CalculateRouteResponseToJSON(value?: CalculateRouteResponse | nu
     }
     return {
         
+        'estimatedStartDate': (value.estimatedStartDate.toISOString()),
+        'estimatedEndDate': (value.estimatedEndDate.toISOString()),
+        'avgLoadTime': value.avgLoadTime,
         'distance': value.distance,
         'duration': value.duration,
         'durationWithLoadTime': value.durationWithLoadTime,
         'geometry': RouteGeometryToJSON(value.geometry),
         'optimizedRouteStops': value.optimizedRouteStops,
-        'estimatedStartDate': (value.estimatedStartDate.toISOString()),
-        'estimatedEndDate': (value.estimatedEndDate.toISOString()),
-        'avgLoadTime': value.avgLoadTime,
     };
 }
 
