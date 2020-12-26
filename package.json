@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "react-dotenv && react-scripts start",
-    "serve": "react-dotenv && serve dist",
+    "serve": "react-dotenv && serve build",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
