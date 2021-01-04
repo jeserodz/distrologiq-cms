@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
-import * as Mui from '@material-ui/core';
-import * as MuiIcons from '@material-ui/icons';
-import { useFormik } from 'formik';
-import { Map } from '../../components/Map';
-import { PlacesSearchConnector } from '../../components/PlacesSearch';
-import { Place } from '../../types';
-import { Destination, CreateDestinationDTO } from '../../api';
-import { formSchema, initialValues } from './DestinationScreen.form';
-import { ConfirmationDialog } from '../../components/ConfirmationDialog';
-import './DestinationScreen.css';
+import React, { useState, useEffect } from "react";
+import * as Mui from "@material-ui/core";
+import * as MuiIcons from "@material-ui/icons";
+import { useFormik } from "formik";
+import { Map } from "../../components/Map";
+import { PlacesSearchConnector } from "../../components/PlacesSearch";
+import { Place } from "../../types";
+import { Destination, CreateDestinationDTO } from "../../api";
+import { formSchema, initialValues } from "./DestinationScreen.form";
+import { ConfirmationDialog } from "../../components/ConfirmationDialog";
+import "./DestinationScreen.css";
 
 export interface DestinationScreenProps {
   destination: Destination | undefined;
@@ -19,6 +19,22 @@ export interface DestinationScreenProps {
 export function DestinationScreen(props: DestinationScreenProps) {
   const [focusedPlace, setFocusedPlace] = useState<Place | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [displayAllData, setDisplayAllData] = useState(
+    window.innerWidth <= 600 === false
+  );
+
+  // Hides table columns when screen resizes
+  useEffect(() => {
+    function resizeHandler() {
+      setDisplayAllData(window.innerWidth <= 600 === false);
+    }
+
+    window.addEventListener("resize", resizeHandler);
+
+    return () => {
+      window.removeEventListener("resize", resizeHandler);
+    };
+  }, []);
 
   const formik = useFormik({
     validationSchema: formSchema,
@@ -33,13 +49,13 @@ export function DestinationScreen(props: DestinationScreenProps) {
 
   function handleSearchPlaceClick(place: Place, setFieldValue: any) {
     setFocusedPlace(null);
-    formik.setFieldValue('latitude', place.latitude);
-    formik.setFieldValue('longitude', place.longitude);
+    formik.setFieldValue("latitude", place.latitude);
+    formik.setFieldValue("longitude", place.longitude);
   }
 
   function handleMapDblClick(lat: number, lng: number, setFieldValue: any) {
-    formik.setFieldValue('latitude', lat);
-    formik.setFieldValue('longitude', lng);
+    formik.setFieldValue("latitude", lat);
+    formik.setFieldValue("longitude", lng);
   }
 
   function handleSubmit(values: CreateDestinationDTO) {
@@ -183,26 +199,28 @@ export function DestinationScreen(props: DestinationScreenProps) {
                 </Mui.Grid>
               </Mui.Grid>
             </Mui.Box>
-
-            <div className="DestinationScreen_Map">
-              <Map
-                place={formik.values}
-                focusedPlace={focusedPlace}
-                onDblClick={(lat, lng) =>
-                  handleMapDblClick(lat, lng, formik.setFieldValue)
-                }
-              />
-              <PlacesSearchConnector
-                onHover={handleSearchPlaceHover}
-                onClick={(place) =>
-                  handleSearchPlaceClick(place, formik.setFieldValue)
-                }
-              />
-            </div>
+            {displayAllData && (
+              <>
+                <div className="DestinationScreen_Map">
+                  <Map
+                    place={formik.values}
+                    focusedPlace={focusedPlace}
+                    onDblClick={(lat, lng) =>
+                      handleMapDblClick(lat, lng, formik.setFieldValue)
+                    }
+                  />
+                  <PlacesSearchConnector
+                    onHover={handleSearchPlaceHover}
+                    onClick={(place) =>
+                      handleSearchPlaceClick(place, formik.setFieldValue)
+                    }
+                  />
+                </div>
+              </>
+            )}
           </Mui.Paper>
         </Mui.Box>
       </div>
-
       <ConfirmationDialog
         open={deleteDialogOpen}
         title="Eliminar Destino"

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Paper,
   Table,
@@ -6,11 +6,11 @@ import {
   Typography,
   Fab,
   Box,
-} from '@material-ui/core';
-import { Add } from '@material-ui/icons';
-import { TableRow, TableCell, TableBody } from '@material-ui/core';
-import { renderRoles } from '../../utils/render-roles';
-import { User } from '../../api';
+} from "@material-ui/core";
+import { Add } from "@material-ui/icons";
+import { TableRow, TableCell, TableBody } from "@material-ui/core";
+import { renderRoles } from "../../utils/render-roles";
+import { User } from "../../api";
 
 export interface UsersScreenProps {
   users: User[];
@@ -19,6 +19,23 @@ export interface UsersScreenProps {
 }
 
 export function UsersScreen(props: UsersScreenProps) {
+  const [displayAllData, setDisplayAllData] = useState(
+    window.innerWidth <= 600 === false
+  );
+
+  // Hides table columns when screen resizes
+  useEffect(() => {
+    function resizeHandler() {
+      setDisplayAllData(window.innerWidth <= 600 === false);
+    }
+
+    window.addEventListener("resize", resizeHandler);
+
+    return () => {
+      window.removeEventListener("resize", resizeHandler);
+    };
+  }, []);
+
   return (
     <div className="DashboardScreen UsersScreen">
       <div className="DashboardScreen_Header">
@@ -30,8 +47,12 @@ export function UsersScreen(props: UsersScreenProps) {
             <TableHead>
               <TableRow>
                 <TableCell>Nombre</TableCell>
-                <TableCell>Email</TableCell>
-                <TableCell>Roles</TableCell>
+                {displayAllData && (
+                  <>
+                    <TableCell>Email</TableCell>
+                    <TableCell>Roles</TableCell>
+                  </>
+                )}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -42,8 +63,12 @@ export function UsersScreen(props: UsersScreenProps) {
                   onClick={() => props.onUserPress(user)}
                 >
                   <TableCell>{user.displayName}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>{renderRoles(user)}</TableCell>
+                  {displayAllData && (
+                    <>
+                      <TableCell>{user.email}</TableCell>
+                      <TableCell>{renderRoles(user)}</TableCell>
+                    </>
+                  )}
                 </TableRow>
               ))}
             </TableBody>
