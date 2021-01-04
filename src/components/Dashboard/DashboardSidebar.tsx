@@ -1,7 +1,8 @@
-import React from "react";
-import { Drawer } from "@material-ui/core";
+import React, { useState, useEffect } from "react";
+import clsx from "clsx";
+import { Drawer, Divider } from "@material-ui/core";
 import { List, ListItem, ListItemIcon, ListItemText } from "@material-ui/core";
-import { Divider, makeStyles, createStyles, Theme } from "@material-ui/core";
+import { makeStyles, createStyles, Theme } from "@material-ui/core";
 import { Map, Room, Group, Settings, ExitToApp } from "@material-ui/icons";
 import { DashboardLinks } from "./DaskboardLinks";
 
@@ -11,31 +12,72 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     drawer: {
       width: drawerWidth,
-      flexShrink: 0
+      flexShrink: 0,
+      whiteSpace: "nowrap",
+    },
+    drawerOpen: {
+      width: drawerWidth,
+      transition: theme.transitions.create("width", {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+    },
+    drawerClose: {
+      transition: theme.transitions.create("width", {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+      }),
+      overflowX: "hidden",
+      width: theme.spacing(7) + 1,
+      [theme.breakpoints.up("sm")]: {
+        width: theme.spacing(9) + 1,
+      },
     },
     drawerPaper: {
-      width: drawerWidth
+      width: drawerWidth,
     },
     content: {
       flexGrow: 1,
-      padding: theme.spacing(3)
+      padding: theme.spacing(3),
     },
-    toolbar: theme.mixins.toolbar
+    toolbar: theme.mixins.toolbar,
   })
 );
 
 export interface DashboardSidebarProps {
   onPress: (link: DashboardLinks) => void;
+  window?: () => Window;
 }
 
 export function DashboardSidebar(props: DashboardSidebarProps) {
   const classes = useStyles();
+  const [open, setOpen] = useState(window.innerWidth <= 600 === false);
+
+  // toggles sidebar when screen resizes
+  useEffect(() => {
+    function resizeHandler() {
+      setOpen(window.innerWidth <= 600 === false);
+    }
+
+    window.addEventListener("resize", resizeHandler);
+
+    return () => {
+      window.removeEventListener("resize", resizeHandler);
+    };
+  }, []);
+
   return (
     <Drawer
-      className={classes.drawer}
       variant="permanent"
+      className={clsx(classes.drawer, {
+        [classes.drawerOpen]: open,
+        [classes.drawerClose]: !open,
+      })}
       classes={{
-        paper: classes.drawerPaper
+        paper: clsx({
+          [classes.drawerOpen]: open,
+          [classes.drawerClose]: !open,
+        }),
       }}
     >
       <div className={classes.toolbar} />

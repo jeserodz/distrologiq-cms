@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from "react";
 import {
   Paper,
   Table,
@@ -6,10 +6,10 @@ import {
   Typography,
   Fab,
   Box,
-} from '@material-ui/core';
-import { TableRow, TableCell, TableBody } from '@material-ui/core';
-import { Add } from '@material-ui/icons';
-import { Destination } from '../../api';
+} from "@material-ui/core";
+import { TableRow, TableCell, TableBody } from "@material-ui/core";
+import { Add } from "@material-ui/icons";
+import { Destination } from "../../api";
 
 export interface DestinationsScreenProps {
   destinations: Destination[];
@@ -18,6 +18,23 @@ export interface DestinationsScreenProps {
 }
 
 export function DestinationsScreen(props: DestinationsScreenProps) {
+  const [displayAllData, setDisplayAllData] = useState(
+    window.innerWidth <= 600 === false
+  );
+
+  // Hides table columns when screen resizes
+  useEffect(() => {
+    function resizeHandler() {
+      setDisplayAllData(window.innerWidth <= 600 === false);
+    }
+
+    window.addEventListener("resize", resizeHandler);
+
+    return () => {
+      window.removeEventListener("resize", resizeHandler);
+    };
+  }, []);
+
   return (
     <div className="DashboardScreen DestinationsScreen">
       <div className="DashboardScreen_Header">
@@ -29,9 +46,13 @@ export function DestinationsScreen(props: DestinationsScreenProps) {
             <TableHead>
               <TableRow>
                 <TableCell>Nombre</TableCell>
-                <TableCell>Email</TableCell>
-                <TableCell>Teléfono</TableCell>
-                <TableCell>Código</TableCell>
+                {displayAllData && (
+                  <>
+                    <TableCell>Email</TableCell>
+                    <TableCell>Teléfono</TableCell>
+                    <TableCell>Código</TableCell>
+                  </>
+                )}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -42,9 +63,19 @@ export function DestinationsScreen(props: DestinationsScreenProps) {
                   onClick={() => props.onDestinationPress(destination)}
                 >
                   <TableCell>{destination.name}</TableCell>
-                  <TableCell>{destination.email || 'No Disponible'}</TableCell>
-                  <TableCell>{destination.phone || 'No Disponible'}</TableCell>
-                  <TableCell>{destination.code || 'No Disponible'}</TableCell>
+                  {displayAllData && (
+                    <>
+                      <TableCell>
+                        {destination.email || "No Disponible"}
+                      </TableCell>
+                      <TableCell>
+                        {destination.phone || "No Disponible"}
+                      </TableCell>
+                      <TableCell>
+                        {destination.code || "No Disponible"}
+                      </TableCell>
+                    </>
+                  )}
                 </TableRow>
               ))}
             </TableBody>

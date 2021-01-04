@@ -1,16 +1,16 @@
-import React from 'react';
-import { RouteComponentProps, useNavigate } from '@reach/router';
-import { AppBar, Toolbar, Typography } from '@material-ui/core';
-import { makeStyles, createStyles, Theme } from '@material-ui/core';
-import { DashboardLinks } from './DaskboardLinks';
-import { DashboardSidebar } from './DashboardSidebar';
-import './Dashboard.css';
-import { AuthGuard } from '../AuthGuard';
+import React from "react";
+import { RouteComponentProps, useNavigate } from "@reach/router";
+import { AppBar, Toolbar, Typography } from "@material-ui/core";
+import { makeStyles, createStyles, Theme } from "@material-ui/core";
+import { DashboardLinks } from "./DaskboardLinks";
+import { DashboardSidebar } from "./DashboardSidebar";
+import "./Dashboard.css";
+import { AuthGuard } from "../AuthGuard";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      display: 'flex',
+      display: "flex",
     },
     appBar: {
       zIndex: theme.zIndex.drawer + 1,
@@ -34,7 +34,7 @@ export function Dashboard(props: Props) {
   function handleSidebarPress(link: DashboardLinks) {
     switch (link) {
       case DashboardLinks.Logout:
-        return navigate('/login', { replace: true });
+        return navigate("/login", { replace: true });
       default:
         return navigate(link);
     }
